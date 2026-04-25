@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -31,7 +31,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
   };
 
   return (
-    <motion.div
+    <Motion.div    
       layout
       variants={fadeUp}
       custom={index}
@@ -116,7 +116,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
               { label: '−', action: () => handleQty(qty - 1), disabled: qty <= 1 },
               { label: '+', action: () => handleQty(qty + 1), disabled: !item.is_available || qty >= item.variant?.stock?.quantity },
             ].map((btn, i) => (
-              <motion.button
+              <Motion.button              
                 key={i}
                 whileTap={{ scale: 0.85 }}
                 onClick={btn.action}
@@ -130,7 +130,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
                 }}
               >
                 {btn.label}
-              </motion.button>
+              </Motion.button>              
             ))}
             <div style={{
               width: '40px', height: '36px',
@@ -146,7 +146,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
 
           {/* Availability Warning */}
           {!item.is_available && (
-            <motion.span
+            <Motion.span            
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               style={{
@@ -156,7 +156,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
               }}
             >
               ⚠ {t('products.out_of_stock')}
-            </motion.span>
+            </Motion.span>            
           )}
         </div>
       </div>
@@ -182,7 +182,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
           {Number(item.variant?.price).toLocaleString()} × {qty}
         </div>
 
-        <motion.button
+        <Motion.button        
           whileHover={{ scale: 1.1, color: 'var(--danger)' }}
           whileTap={{ scale: 0.9 }}
           onClick={handleRemove}
@@ -207,16 +207,16 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
           }}
         >
           🗑 {t('cart.remove')}
-        </motion.button>
+        </Motion.button>        
       </div>
-    </motion.div>
+    </Motion.div>    
   );
 }
 
 // ─── Empty Cart ────────────────────────────────────────────────────────────────
 function EmptyCart({ t, isRTL }) {
   return (
-    <motion.div
+    <Motion.div    
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -227,14 +227,13 @@ function EmptyCart({ t, isRTL }) {
       }}
     >
       {/* Animated Cart Icon */}
-      <motion.div
+    <Motion.div      
         animate={{ y: [0, -12, 0], rotate: [0, -5, 5, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
         style={{ fontSize: '80px' }}
       >
         🛒
-      </motion.div>
-
+      </Motion.div>
       <div style={{
         fontSize: '28px', fontWeight: 800,
         color: 'var(--text-primary)',
@@ -253,7 +252,7 @@ function EmptyCart({ t, isRTL }) {
       </p>
 
       <Link to="/products" style={{ textDecoration: 'none' }}>
-        <motion.button
+        <Motion.button        
           whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(108,99,255,0.3)' }}
           whileTap={{ scale: 0.97 }}
           style={{
@@ -265,9 +264,9 @@ function EmptyCart({ t, isRTL }) {
           }}
         >
           {t('cart.continue')} →
-        </motion.button>
+        </Motion.button>        
       </Link>
-    </motion.div>
+    </Motion.div>    
   );
 }
 
@@ -278,7 +277,7 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
   const grand    = total + shipping;
 
   return (
-    <motion.div
+    <Motion.div    
       initial={{ opacity: 0, x: isRTL ? -40 : 40 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
@@ -342,7 +341,7 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
               height: '6px', background: 'var(--bg-hover)',
               borderRadius: '3px', overflow: 'hidden',
             }}>
-              <motion.div
+              <Motion.div              
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min((total / 500) * 100, 100)}%` }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -373,7 +372,7 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
       </div>
 
       {/* Checkout Button */}
-      <motion.button
+      <Motion.button      
         whileHover={{ scale: 1.03, boxShadow: '0 0 40px rgba(108,99,255,0.4)' }}
         whileTap={{ scale: 0.97 }}
         onClick={onCheckout}
@@ -390,18 +389,19 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
         }}
       >
         {isLoading ? (
-          <motion.span
+          <Motion.span          
             animate={{ rotate: 360 }}
             transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-          >⟳</motion.span>
+          >⟳</Motion.span>          
         ) : (
           <>{t('cart.checkout')} →</>
         )}
-      </motion.button>
+      </Motion.button>
 
       {/* Continue Shopping */}
       <Link to="/products" style={{ textDecoration: 'none' }}>
-        <motion.button
+        <Motion.button
+
           whileHover={{ scale: 1.02 }}
           style={{
             width: '100%', background: 'transparent',
@@ -411,7 +411,7 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
           }}
         >
           {t('cart.continue')}
-        </motion.button>
+        </Motion.button>        
       </Link>
 
       {/* Trust Badges */}
@@ -429,7 +429,7 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
           </div>
         ))}
       </div>
-    </motion.div>
+    </Motion.div>    
   );
 }
 
@@ -443,7 +443,7 @@ function CartSkeleton() {
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {[...Array(3)].map((_, i) => (
-          <motion.div key={i}
+          <Motion.div key={i}          
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
             style={{
@@ -453,7 +453,7 @@ function CartSkeleton() {
           />
         ))}
       </div>
-      <motion.div
+      <Motion.div      
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 1.5, repeat: Infinity }}
         style={{
@@ -506,7 +506,7 @@ export default function Cart() {
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
         {/* ── Header ── */}
-        <motion.div
+        <Motion.div        
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -544,7 +544,7 @@ export default function Cart() {
 
           {/* Clear Cart */}
           {items.length > 0 && (
-            <motion.button
+            <Motion.button            
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => clearCart.mutate()}
@@ -566,9 +566,9 @@ export default function Cart() {
               }}
             >
               🗑 {isRTL ? 'مسح الكل' : 'Clear All'}
-            </motion.button>
+            </Motion.button>            
           )}
-        </motion.div>
+        </Motion.div>
 
         {/* ── Content ── */}
         {isLoading ? (
@@ -583,7 +583,7 @@ export default function Cart() {
           }}>
 
             {/* Items List */}
-            <motion.div
+            <Motion.div            
               initial="hidden"
               animate="visible"
               style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
@@ -604,7 +604,7 @@ export default function Cart() {
 
               {/* Unavailable Warning */}
               {items.some(i => !i.is_available) && (
-                <motion.div
+                <Motion.div                
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   style={{
@@ -619,10 +619,10 @@ export default function Cart() {
                   {isRTL
                     ? 'بعض المنتجات غير متاحة، يرجى مراجعة سلتك قبل الإتمام'
                     : 'Some items are unavailable. Please review before checkout.'}
-                </motion.div>
+                </Motion.div>                
               )}
-            </motion.div>
-
+            </Motion.div>
+            
             {/* Order Summary */}
             <OrderSummary
               cart={cart}

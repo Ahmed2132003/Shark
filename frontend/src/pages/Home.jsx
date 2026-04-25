@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion as Motion, useScroll, useTransform } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import api from '../services/api';
@@ -50,7 +50,7 @@ function HeroSection({ t, isRTL }) {
         { w: 300, h: 300, top: '60%',  right: '-5%', color: 'rgba(167,139,250,0.08)' },
         { w: 200, h: 200, top: '30%',  left: '60%',  color: 'rgba(108,99,255,0.05)' },
       ].map((orb, i) => (
-        <motion.div key={i}
+        <Motion.div key={i}        
           animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
           transition={{ duration: 6 + i * 2, repeat: Infinity, ease: 'easeInOut' }}
           style={{
@@ -76,11 +76,11 @@ function HeroSection({ t, isRTL }) {
       }} />
 
       {/* Content */}
-      <motion.div style={{ y, opacity, position: 'relative', zIndex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
-        <motion.div variants={stagger} initial="hidden" animate="visible">
+      <Motion.div style={{ y, opacity, position: 'relative', zIndex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        <Motion.div variants={stagger} initial="hidden" animate="visible">
 
           {/* Badge */}
-          <motion.div variants={fadeUp} custom={0} style={{
+          <Motion.div variants={fadeUp} custom={0} style={{            
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             background: 'var(--accent-glow)',
             border: '1px solid rgba(108,99,255,0.3)',
@@ -90,10 +90,10 @@ function HeroSection({ t, isRTL }) {
             <span style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: 700, letterSpacing: '2px' }}>
               ✦ NEW SEASON
             </span>
-          </motion.div>
+          </Motion.div>
 
           {/* Title */}
-          <motion.h1 variants={fadeUp} custom={1} style={{
+          <Motion.h1 variants={fadeUp} custom={1} style={{            
             fontSize: 'clamp(48px, 8vw, 96px)',
             fontWeight: 800,
             lineHeight: 1.05,
@@ -113,10 +113,10 @@ function HeroSection({ t, isRTL }) {
             }}>
               {t('home.hero_title').split(' ').slice(3).join(' ')}
             </span>
-          </motion.h1>
+          </Motion.h1>
 
           {/* Subtitle */}
-          <motion.p variants={fadeUp} custom={2} style={{
+          <Motion.p variants={fadeUp} custom={2} style={{            
             fontSize: 'clamp(16px, 2vw, 20px)',
             color: 'var(--text-secondary)',
             marginBottom: '48px',
@@ -124,13 +124,13 @@ function HeroSection({ t, isRTL }) {
             lineHeight: 1.8,
           }}>
             {t('home.hero_subtitle')}
-          </motion.p>
+          </Motion.p>
 
           {/* CTAs */}
-          <motion.div variants={fadeUp} custom={3}
+          <Motion.div variants={fadeUp} custom={3}
             style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <Link to="/products" style={{ textDecoration: 'none' }}>
-              <motion.button
+              <Motion.button
                 whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(108,99,255,0.4)' }}
                 whileTap={{ scale: 0.97 }}
                 style={{
@@ -142,11 +142,11 @@ function HeroSection({ t, isRTL }) {
                 }}
               >
                 {t('home.shop_now')} →
-              </motion.button>
+              </Motion.button>
             </Link>
 
             <Link to="/products" style={{ textDecoration: 'none' }}>
-              <motion.button
+              <Motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
                 style={{
@@ -158,12 +158,12 @@ function HeroSection({ t, isRTL }) {
                 }}
               >
                 {t('home.view_all')}
-              </motion.button>
+              </Motion.button>
             </Link>
-          </motion.div>
+          </Motion.div>
 
           {/* Stats */}
-          <motion.div variants={fadeUp} custom={4}
+          <Motion.div variants={fadeUp} custom={4}
             style={{ display: 'flex', gap: '48px', marginTop: '72px', flexWrap: 'wrap' }}>
             {[
               { num: '10K+', label: isRTL ? 'عميل سعيد' : 'Happy Customers' },
@@ -184,13 +184,13 @@ function HeroSection({ t, isRTL }) {
                 </div>
               </div>
             ))}
-          </motion.div>
+          </Motion.div>
 
-        </motion.div>
-      </motion.div>
+        </Motion.div>
+      </Motion.div>
 
       {/* Scroll Indicator */}
-      <motion.div
+      <Motion.div
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
         style={{
@@ -200,7 +200,7 @@ function HeroSection({ t, isRTL }) {
         }}
       >
         ↓
-      </motion.div>
+      </Motion.div>
     </section>
   );
 }
@@ -208,7 +208,7 @@ function HeroSection({ t, isRTL }) {
 
 function CategoryCard({ cat, index }) {
   return (
-    <motion.div
+    <Motion.div
       variants={fadeUp} custom={index}
       whileHover={{ y: -8, scale: 1.02 }}
       style={{
@@ -250,7 +250,7 @@ function CategoryCard({ cat, index }) {
         </div>
 
         {/* Hover Overlay */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0 }}
           whileHover={{ opacity: 1 }}
           style={{
@@ -260,14 +260,14 @@ function CategoryCard({ cat, index }) {
           }}
         />
       </Link>
-    </motion.div>
+    </Motion.div>
   );
 }
 
 
 function ProductCard({ product, index, t }) {
   return (
-    <motion.div
+    <Motion.div
       variants={fadeUp} custom={index}
       whileHover={{ y: -8 }}
       style={{
@@ -286,7 +286,7 @@ function ProductCard({ product, index, t }) {
         {/* Image */}
         <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/3' }}>
           {product.main_image ? (
-            <motion.img
+            <Motion.img
               src={product.main_image} alt={product.name}
               whileHover={{ scale: 1.08 }}
               transition={{ duration: 0.5 }}
@@ -356,7 +356,7 @@ function ProductCard({ product, index, t }) {
             }}>
               {Number(product.base_price).toLocaleString()} {t('common.egp')}
             </div>
-            <motion.div
+            <Motion.div
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               style={{
@@ -369,11 +369,11 @@ function ProductCard({ product, index, t }) {
               }}
             >
               🛒
-            </motion.div>
+            </Motion.div>
           </div>
         </div>
       </Link>
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -404,13 +404,13 @@ export default function Home() {
       <section style={{ padding: '100px 5%' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
-          <motion.div
+          <Motion.div
             initial="hidden" whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
             variants={stagger}
           >
             {/* Section Header */}
-            <motion.div variants={fadeUp} style={{ marginBottom: '56px' }}>
+            <Motion.div variants={fadeUp} style={{ marginBottom: '56px' }}>
               <div style={{
                 fontSize: '12px', color: 'var(--accent)',
                 fontWeight: 700, letterSpacing: '3px',
@@ -425,7 +425,7 @@ export default function Home() {
               }}>
                 {t('home.categories')}
               </h2>
-            </motion.div>
+            </Motion.div>
 
             {catsLoading ? (
               <div style={{
@@ -448,7 +448,7 @@ export default function Home() {
                 ))}
               </div>
             )}
-          </motion.div>
+          </Motion.div>
         </div>
       </section>
 
@@ -468,13 +468,13 @@ export default function Home() {
         }} />
 
         <div style={{ maxWidth: '1400px', margin: '0 auto', position: 'relative' }}>
-          <motion.div
+          <Motion.div
             initial="hidden" whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
             variants={stagger}
           >
             {/* Section Header */}
-            <motion.div variants={fadeUp} style={{
+            <Motion.div variants={fadeUp} style={{
               display: 'flex', alignItems: 'flex-end',
               justifyContent: 'space-between',
               marginBottom: '56px', flexWrap: 'wrap', gap: '16px',
@@ -509,7 +509,7 @@ export default function Home() {
                   {t('home.view_all')} {isRTL ? '←' : '→'}
                 </motion.button>
               </Link>
-            </motion.div>
+            </Motion.div>
 
             {featLoading ? (
               <div style={{
@@ -530,14 +530,14 @@ export default function Home() {
                 ))}
               </div>
             )}
-          </motion.div>
+          </Motion.div>
         </div>
       </section>
 
       {/* ── CTA Banner ── */}
       <section style={{ padding: '100px 5%' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -576,7 +576,7 @@ export default function Home() {
                 {t('home.hero_subtitle')}
               </p>
               <Link to="/products" style={{ textDecoration: 'none' }}>
-                <motion.button
+                <Motion.button
                   whileHover={{ scale: 1.05, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
                   whileTap={{ scale: 0.97 }}
                   style={{
@@ -588,10 +588,10 @@ export default function Home() {
                   }}
                 >
                   {t('home.shop_now')} ✦
-                </motion.button>
+                </Motion.button>
               </Link>
             </div>
-          </motion.div>
+          </Motion.div>
         </div>
       </section>
 
@@ -604,7 +604,7 @@ export default function Home() {
 
 function SkeletonCard({ tall }) {
   return (
-    <motion.div
+    <Motion.div
       animate={{ opacity: [0.5, 1, 0.5] }}
       transition={{ duration: 1.5, repeat: Infinity }}
       style={{
@@ -634,6 +634,6 @@ function SkeletonCard({ tall }) {
           borderRadius: '8px',
         }} />
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }

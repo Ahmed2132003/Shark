@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
@@ -28,7 +28,7 @@ function PasswordStrength({ password, isRTL }) {
   if (!password) return null;
 
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       style={{ marginTop: '12px' }}
@@ -58,29 +58,29 @@ function PasswordStrength({ password, isRTL }) {
         gap: '6px',
       }}>
         {checks.map((check, i) => (
-          <motion.div key={i}
+          <Motion.div key={i}
             animate={{ color: check.test ? 'var(--success)' : 'var(--text-muted)' }}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
               fontSize: '11px', fontWeight: 600,
             }}
           >
-            <motion.span
+            <Motion.span
               animate={{ scale: check.test ? [1, 1.3, 1] : 1 }}
               transition={{ duration: 0.3 }}
             >
               {check.test ? '✓' : '○'}
-            </motion.span>
+            </Motion.span>
             {check.label}
-          </motion.div>
+          </Motion.div>
         ))}
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }
 
 // ─── Progress Steps ────────────────────────────────────────────────────────────
-function StepIndicator({ current, total, isRTL }) {
+function StepIndicator({ current, total }) {  
   return (
     <div style={{
       display: 'flex', alignItems: 'center',
@@ -89,7 +89,7 @@ function StepIndicator({ current, total, isRTL }) {
     }}>
       {[...Array(total)].map((_, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <motion.div
+          <Motion.div
             animate={{
               background: i < current
                 ? 'var(--success)'
@@ -109,7 +109,7 @@ function StepIndicator({ current, total, isRTL }) {
             }}
           >
             {i < current ? '✓' : i + 1}
-          </motion.div>
+          </Motion.div>
           {i < total - 1 && (
             <div style={{
               width: '40px', height: '2px',
@@ -167,7 +167,7 @@ function InputField({ label, type = 'text', value, onChange, placeholder, error,
           }}
         />
         {isPassword && (
-          <motion.button whileTap={{ scale: 0.9 }}
+          <Motion.button whileTap={{ scale: 0.9 }}
             onClick={() => setShowPass(!showPass)} type="button"
             style={{
               position: 'absolute', top: '50%',
@@ -178,12 +178,12 @@ function InputField({ label, type = 'text', value, onChange, placeholder, error,
             }}
           >
             {showPass ? '🙈' : '👁️'}
-          </motion.button>
+          </Motion.button>
         )}
       </div>
       <AnimatePresence>
         {error && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             style={{
@@ -192,7 +192,7 @@ function InputField({ label, type = 'text', value, onChange, placeholder, error,
             }}
           >
             ⚠ {error}
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </div>
@@ -293,7 +293,7 @@ export default function Register() {
         { w: 500, h: 500, top: '-20%', right: '-10%', color: 'rgba(108,99,255,0.07)', dur: 9 },
         { w: 350, h: 350, top: '70%',  left: '-8%',   color: 'rgba(167,139,250,0.06)', dur: 11 },
       ].map((orb, i) => (
-        <motion.div key={i}
+        <Motion.div key={i}
           animate={{ y: [0, -20, 0] }}
           transition={{ duration: orb.dur, repeat: Infinity, ease: 'easeInOut' }}
           style={{
@@ -305,7 +305,7 @@ export default function Register() {
         />
       ))}
 
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -357,7 +357,7 @@ export default function Register() {
         {/* General Error */}
         <AnimatePresence>
           {errors.general && (
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -370,14 +370,14 @@ export default function Register() {
               }}
             >
               ⚠️ {errors.general}
-            </motion.div>
+            </Motion.div>
           )}
         </AnimatePresence>
 
         {/* Steps */}
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <motion.div key="step0"
+            <Motion.div key="step0"
               initial={{ opacity: 0, x: isRTL ? -30 : 30 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: isRTL ? 30 : -30 }}
@@ -401,11 +401,11 @@ export default function Register() {
                 placeholder="+20 1xx xxx xxxx"
                 error={errors.phone}       icon="📱" isRTL={isRTL}
               />
-            </motion.div>
+            </Motion.div>
           )}
 
           {step === 1 && (
-            <motion.div key="step1"
+            <Motion.div key="step1"
               initial={{ opacity: 0, x: isRTL ? -30 : 30 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: isRTL ? 30 : -30 }}
@@ -427,14 +427,14 @@ export default function Register() {
                   error={errors.password2}           icon="🔐" isRTL={isRTL}
                 />
               </div>
-            </motion.div>
+            </Motion.div>
           )}
         </AnimatePresence>
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
           {step > 0 && (
-            <motion.button
+            <Motion.button
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
               onClick={() => setStep(s => s - 1)}
               style={{
@@ -446,10 +446,10 @@ export default function Register() {
               }}
             >
               {isRTL ? '→ رجوع' : '← Back'}
-            </motion.button>
+            </Motion.button>
           )}
 
-          <motion.button
+          <Motion.button
             whileHover={{ scale: 1.02, boxShadow: '0 0 40px rgba(108,99,255,0.35)' }}
             whileTap={{ scale: 0.97 }}
             onClick={handleNext}
@@ -467,10 +467,10 @@ export default function Register() {
           >
             {registerMutation.isLoading ? (
               <>
-                <motion.span
+                <Motion.span
                   animate={{ rotate: 360 }}
                   transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-                >⟳</motion.span>
+                >⟳</Motion.span>
                 {isRTL ? 'جاري الإنشاء...' : 'Creating...'}
               </>
             ) : step < 1 ? (
@@ -478,7 +478,7 @@ export default function Register() {
             ) : (
               <>{t('auth.register_btn')} ✦</>
             )}
-          </motion.button>
+          </Motion.button>
         </div>
 
         {/* Login Link */}
@@ -493,7 +493,7 @@ export default function Register() {
             {t('auth.login_btn')}
           </Link>
         </div>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
@@ -25,7 +25,7 @@ function ImageGallery({ images, name }) {
     <div style={{ position: 'sticky', top: '90px' }}>
 
       {/* Main Image */}
-      <motion.div
+      <Motion.div
         layoutId="main-image"
         onClick={() => setZoomed(true)}
         style={{
@@ -37,7 +37,7 @@ function ImageGallery({ images, name }) {
         }}
       >
         <AnimatePresence mode="wait">
-          <motion.div key={active}
+          <Motion.div key={active}
             initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -60,7 +60,7 @@ function ImageGallery({ images, name }) {
                 📦
               </div>
             )}
-          </motion.div>
+          </Motion.div>
         </AnimatePresence>
 
         {/* Zoom Icon */}
@@ -71,13 +71,13 @@ function ImageGallery({ images, name }) {
         }}>
           🔍
         </div>
-      </motion.div>
+      </Motion.div>
 
       {/* Thumbnails */}
       {imgs.length > 1 && (
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           {imgs.map((img, i) => (
-            <motion.div
+            <Motion.div
               key={i}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -101,7 +101,7 @@ function ImageGallery({ images, name }) {
                   justifyContent: 'center', fontSize: '28px',
                 }}>📦</div>
               )}
-            </motion.div>
+            </Motion.div>
           ))}
         </div>
       )}
@@ -109,7 +109,7 @@ function ImageGallery({ images, name }) {
       {/* Zoom Modal */}
       <AnimatePresence>
         {zoomed && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -122,7 +122,7 @@ function ImageGallery({ images, name }) {
               backdropFilter: 'blur(12px)',
             }}
           >
-            <motion.img
+            <Motion.img
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
@@ -140,7 +140,7 @@ function ImageGallery({ images, name }) {
               color: 'white', fontSize: '20px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>✕</button>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </div>
@@ -148,7 +148,7 @@ function ImageGallery({ images, name }) {
 }
 
 // ─── Variant Selector ──────────────────────────────────────────────────────────
-function VariantSelector({ variants, selected, onSelect, t }) {
+function VariantSelector({ variants, selected, onSelect }) {  
   return (
     <div style={{ marginBottom: '28px' }}>
       <div style={{
@@ -166,7 +166,7 @@ function VariantSelector({ variants, selected, onSelect, t }) {
           const isAvailable = variant.stock?.is_available;
 
           return (
-            <motion.button
+            <Motion.button
               key={variant.id}
               whileHover={{ scale: isAvailable ? 1.05 : 1 }}
               whileTap={{ scale: isAvailable ? 0.95 : 1 }}
@@ -210,7 +210,7 @@ function VariantSelector({ variants, selected, onSelect, t }) {
                   ({variant.stock.quantity} left)
                 </span>
               )}
-            </motion.button>
+            </Motion.button>
           );
         })}
       </div>
@@ -230,7 +230,7 @@ function QuantitySelector({ quantity, setQuantity, max }) {
         { label: '−', action: () => setQuantity(q => Math.max(1, q - 1)), disabled: quantity <= 1 },
         { label: '+', action: () => setQuantity(q => Math.min(max, q + 1)), disabled: quantity >= max },
       ].map((btn, i) => (
-        <motion.button
+        <Motion.button
           key={i}
           whileTap={{ scale: 0.9 }}
           onClick={btn.action}
@@ -245,7 +245,7 @@ function QuantitySelector({ quantity, setQuantity, max }) {
           }}
         >
           {btn.label}
-        </motion.button>
+        </Motion.button>
       ))}
       <div style={{
         width: '52px', height: '44px',
@@ -264,7 +264,7 @@ function QuantitySelector({ quantity, setQuantity, max }) {
 // ─── Toast Notification ────────────────────────────────────────────────────────
 function Toast({ message, type }) {
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0, y: 40, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 40, scale: 0.9 }}
@@ -280,7 +280,7 @@ function Toast({ message, type }) {
       }}
     >
       {type === 'success' ? '✓ ' : '✕ '}{message}
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -292,7 +292,7 @@ function ProductDetailSkeleton() {
       gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
       gap: '60px', padding: '40px 5%', maxWidth: '1400px', margin: '0 auto',
     }}>
-      <motion.div
+      <Motion.div
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >
@@ -308,8 +308,8 @@ function ProductDetailSkeleton() {
             }} />
           ))}
         </div>
-      </motion.div>
-      <motion.div
+      </Motion.div>
+      <Motion.div
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
         style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
@@ -321,7 +321,7 @@ function ProductDetailSkeleton() {
             background: 'var(--bg-card)', borderRadius: '10px',
           }} />
         ))}
-      </motion.div>
+      </Motion.div>
     </div>
   );
 }
@@ -382,7 +382,7 @@ export default function ProductDetail() {
     }}>
       <div style={{ fontSize: '64px' }}>😕</div>
       <div style={{ fontSize: '20px', fontWeight: 700 }}>{t('common.error')}</div>
-      <motion.button
+      <Motion.button
         whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}
         onClick={() => navigate('/products')}
         style={{
@@ -392,7 +392,7 @@ export default function ProductDetail() {
         }}
       >
         {t('common.back')}
-      </motion.button>
+      </Motion.button>
     </div>
   );
 
@@ -405,7 +405,7 @@ export default function ProductDetail() {
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
         {/* Breadcrumb */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           style={{
             display: 'flex', alignItems: 'center', gap: '8px',
@@ -439,7 +439,7 @@ export default function ProductDetail() {
               )}
             </span>
           ))}
-        </motion.div>
+        </Motion.div>
 
         {/* Main Grid */}
         <div style={{
@@ -449,23 +449,23 @@ export default function ProductDetail() {
         }}>
 
           {/* ── Left: Gallery ── */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, x: isRTL ? 40 : -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <ImageGallery images={product?.images} name={product?.name} />
-          </motion.div>
+          </Motion.div>
 
           {/* ── Right: Info ── */}
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, x: isRTL ? -40 : 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
 
             {/* Category + Badge */}
-            <motion.div variants={fadeUp} custom={0} style={{
+            <Motion.div variants={fadeUp} custom={0} style={{
               display: 'flex', alignItems: 'center',
               gap: '12px', marginBottom: '16px', flexWrap: 'wrap',
             }}>
@@ -493,20 +493,20 @@ export default function ProductDetail() {
                   {t('products.out_of_stock')}
                 </span>
               )}
-            </motion.div>
+            </Motion.div>
 
             {/* Name */}
-            <motion.h1 variants={fadeUp} custom={1} style={{
+            <Motion.h1 variants={fadeUp} custom={1} style={{
               fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800,
               color: 'var(--text-primary)', lineHeight: 1.2,
               marginBottom: '24px',
               fontFamily: "'Syne', 'Cairo', sans-serif",
             }}>
               {product?.name}
-            </motion.h1>
+            </Motion.h1>
 
             {/* Price */}
-            <motion.div variants={fadeUp} custom={2} style={{ marginBottom: '28px' }}>
+            <Motion.div variants={fadeUp} custom={2} style={{ marginBottom: '28px' }}>
               <div style={{
                 fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800,
                 background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
@@ -521,7 +521,7 @@ export default function ProductDetail() {
 
               {/* Stock Status */}
               {selectedVariant && (
-                <motion.div
+                <Motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   style={{
@@ -544,37 +544,37 @@ export default function ProductDetail() {
                       ? `${isRTL ? 'كمية محدودة' : 'Low stock'} — ${selectedVariant.stock.quantity} ${isRTL ? 'متبقي' : 'left'}`
                       : isRTL ? 'متاح' : 'In Stock'
                     : t('products.out_of_stock')}
-                </motion.div>
+                </Motion.div>
               )}
-            </motion.div>
+            </Motion.div>
 
             {/* Description */}
             {product?.description && (
-              <motion.p variants={fadeUp} custom={3} style={{
+              <Motion.p variants={fadeUp} custom={3} style={{
                 color: 'var(--text-secondary)', fontSize: '15px',
                 lineHeight: 1.8, marginBottom: '28px',
                 paddingBottom: '28px',
                 borderBottom: '1px solid var(--border)',
               }}>
                 {product.description}
-              </motion.p>
+              </Motion.p>
             )}
 
             {/* Variant Selector */}
             {product?.variants?.length > 0 && (
-              <motion.div variants={fadeUp} custom={4}>
+              <Motion.div variants={fadeUp} custom={4}>
                 <VariantSelector
                   variants={product.variants}
                   selected={selectedVariant}
                   onSelect={setSelectedVariant}
                   t={t}
                 />
-              </motion.div>
+              </Motion.div>
             )}
 
             {/* Quantity */}
             {canAdd && (
-              <motion.div variants={fadeUp} custom={5} style={{ marginBottom: '28px' }}>
+              <Motion.div variants={fadeUp} custom={5} style={{ marginBottom: '28px' }}>
                 <div style={{
                   fontSize: '12px', fontWeight: 700, letterSpacing: '2px',
                   color: 'var(--text-muted)', marginBottom: '14px',
@@ -587,14 +587,14 @@ export default function ProductDetail() {
                   setQuantity={setQuantity}
                   max={maxQty}
                 />
-              </motion.div>
+              </Motion.div>
             )}
 
             {/* Add to Cart CTA */}
-            <motion.div variants={fadeUp} custom={6}
+            <Motion.div variants={fadeUp} custom={6}
               style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
 
-              <motion.button
+              <Motion.button
                 whileHover={canAdd ? {
                   scale: 1.03,
                   boxShadow: '0 0 40px rgba(108,99,255,0.4)'
@@ -618,21 +618,21 @@ export default function ProductDetail() {
                 }}
               >
                 {addToCart.isLoading ? (
-                  <motion.span
+                  <Motion.span
                     animate={{ rotate: 360 }}
                     transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
                   >
                     ⟳
-                  </motion.span>
+                  </Motion.span>
                 ) : (
                   <>🛒 {canAdd ? t('products.add_to_cart') : t('products.out_of_stock')}</>
                 )}
-              </motion.button>
+              </Motion.button>
 
               {/* Quick Buy */}
               {canAdd && (
                 <Link to="/checkout" style={{ textDecoration: 'none', flex: 1, minWidth: '160px' }}>
-                  <motion.button
+                  <Motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => addToCart.mutate()}
@@ -646,13 +646,13 @@ export default function ProductDetail() {
                     }}
                   >
                     ⚡ {isRTL ? 'اشتري الآن' : 'Buy Now'}
-                  </motion.button>
+                  </Motion.button>
                 </Link>
               )}
-            </motion.div>
+            </Motion.div>
 
             {/* Features */}
-            <motion.div variants={fadeUp} custom={7} style={{
+            <Motion.div variants={fadeUp} custom={7} style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
               gap: '12px', marginTop: '32px',
@@ -677,9 +677,9 @@ export default function ProductDetail() {
                   </div>
                 </div>
               ))}
-            </motion.div>
+            </Motion.div>
 
-          </motion.div>
+          </Motion.div>
         </div>
       </div>
 

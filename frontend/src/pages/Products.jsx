@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import api from '../services/api';
@@ -32,7 +32,7 @@ function ProductCard({ product, index, t, onAddToCart }) {
   };
 
   return (
-    <motion.div
+    <Motion.div
       layout
       variants={fadeUp}
       custom={index}
@@ -53,7 +53,7 @@ function ProductCard({ product, index, t, onAddToCart }) {
         {/* Image */}
         <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/3' }}>
           {product.main_image ? (
-            <motion.img
+            <Motion.img
               src={product.main_image}
               alt={product.name}
               whileHover={{ scale: 1.08 }}
@@ -134,7 +134,7 @@ function ProductCard({ product, index, t, onAddToCart }) {
             </div>
 
             {/* Add to Cart Button */}
-            <motion.button
+            <Motion.button
               onClick={handleAdd}
               whileHover={{ scale: product.in_stock ? 1.1 : 1 }}
               whileTap={{ scale:  product.in_stock ? 0.9 : 1 }}
@@ -159,18 +159,18 @@ function ProductCard({ product, index, t, onAddToCart }) {
               }}
             >
               {adding ? '✓' : '🛒'}
-            </motion.button>
+            </Motion.button>
           </div>
         </div>
       </Link>
-    </motion.div>
+    </Motion.div>
   );
 }
 
 // ─── Skeleton ──────────────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
-    <motion.div
+    <Motion.div
       animate={{ opacity: [0.5, 1, 0.5] }}
       transition={{ duration: 1.5, repeat: Infinity }}
       style={{
@@ -190,7 +190,7 @@ function SkeletonCard() {
           }} />
         ))}
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }
 
@@ -240,7 +240,7 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {[{ slug: '', name: isRTL ? 'الكل' : 'All' }, ...(categories || [])].map(cat => (
-            <motion.button
+            <Motion.button
               key={cat.slug}
               whileHover={{ x: isRTL ? -4 : 4 }}
               onClick={() => setFilters(f => ({ ...f, category: cat.slug }))}
@@ -255,7 +255,7 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
               }}
             >
               {cat.name}
-            </motion.button>
+            </Motion.button>
           ))}
         </div>
       </div>
@@ -292,7 +292,7 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
 
       {/* In Stock */}
       <div style={{ marginBottom: '28px' }}>
-        <motion.button
+        <Motion.button
           whileTap={{ scale: 0.97 }}
           onClick={() => setFilters(f => ({ ...f, in_stock: !f.in_stock }))}
           style={{
@@ -310,20 +310,20 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
             transition: 'all 0.2s', flexShrink: 0,
           }}>
             {filters.in_stock && (
-              <motion.span
+              <Motion.span
                 initial={{ scale: 0 }} animate={{ scale: 1 }}
                 style={{ color: 'white', fontSize: '12px', fontWeight: 700 }}
-              >✓</motion.span>
+              >✓</Motion.span>
             )}
           </div>
           <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '14px' }}>
             {t('products.in_stock')}
           </span>
-        </motion.button>
+        </Motion.button>
       </div>
 
       {/* Reset */}
-      <motion.button
+      <Motion.button
         whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
         onClick={() => setFilters({ category: '', min_price: '', max_price: '', in_stock: false, search: '', ordering: '-created_at' })}
         style={{
@@ -334,14 +334,14 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
         }}
       >
         {isRTL ? '↺ إعادة ضبط' : '↺ Reset Filters'}
-      </motion.button>
+      </Motion.button>
     </div>
   );
 
   if (isMobile) {
     return (
       <AnimatePresence>
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={onClose}
           style={{
@@ -350,13 +350,13 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
             backdropFilter: 'blur(4px)', zIndex: 199,
           }}
         />
-        <motion.div
+        <Motion.div
           initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
           style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200 }}
         >
           {content}
-        </motion.div>
+        </Motion.div>
       </AnimatePresence>
     );
   }
@@ -368,7 +368,7 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
 export default function Products() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();  
   const [filterOpen, setFilterOpen] = useState(false);
   const [isMobile, setIsMobile]     = useState(window.innerWidth < 1024);
 
@@ -412,7 +412,9 @@ export default function Products() {
     if (!firstVariant) return;
     try {
       await api.post('/cart/add/', { variant_id: firstVariant.id, quantity: 1 });
-    } catch {}
+    } catch (error) {
+      console.error('Failed to add product to cart from listing:', error);
+    }    
   };
 
   const products = productsData?.results || productsData || [];
@@ -428,7 +430,7 @@ export default function Products() {
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
 
         {/* ── Page Header ── */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -448,10 +450,10 @@ export default function Products() {
           }}>
             {t('products.title')}
           </h1>
-        </motion.div>
+        </Motion.div>
 
         {/* ── Search + Sort + Filter Button ── */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -503,7 +505,7 @@ export default function Products() {
 
           {/* Mobile Filter Button */}
           {isMobile && (
-            <motion.button
+            <Motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setFilterOpen(true)}
               style={{
@@ -514,9 +516,9 @@ export default function Products() {
               }}
             >
               ⚙️ {t('products.filter')}
-            </motion.button>
+            </Motion.button>
           )}
-        </motion.div>
+        </Motion.div>
 
         {/* ── Layout: Sidebar + Grid ── */}
         <div style={{
@@ -552,7 +554,7 @@ export default function Products() {
                 {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
               </div>
             ) : products.length === 0 ? (
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 style={{
                   textAlign: 'center', padding: '80px 20px',
@@ -563,7 +565,7 @@ export default function Products() {
                 <div style={{ fontSize: '20px', fontWeight: 700, marginBottom: '8px', color: 'var(--text-secondary)' }}>
                   {t('products.no_products')}
                 </div>
-                <motion.button
+                <Motion.button
                   whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}
                   onClick={() => setFilters({ category: '', min_price: '', max_price: '', in_stock: false, search: '', ordering: '-created_at' })}
                   style={{
@@ -574,10 +576,10 @@ export default function Products() {
                   }}
                 >
                   {isRTL ? '↺ إعادة ضبط الفلتر' : '↺ Reset Filters'}
-                </motion.button>
-              </motion.div>
+                </Motion.button>
+              </Motion.div>
             ) : (
-              <motion.div
+              <Motion.div
                 variants={stagger} initial="hidden" animate="visible"
                 style={{
                   display: 'grid',
@@ -596,7 +598,7 @@ export default function Products() {
                     />
                   ))}
                 </AnimatePresence>
-              </motion.div>
+              </Motion.div>
             )}
           </div>
         </div>

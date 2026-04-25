@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-Motion';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from '../store/authStore';
@@ -15,7 +15,7 @@ function BgOrbs() {
         { w: 350, h: 350, top: '60%',  right: '-8%', color: 'rgba(167,139,250,0.07)', dur: 10 },
         { w: 250, h: 250, top: '30%',  left: '50%',  color: 'rgba(108,99,255,0.05)', dur: 6 },
       ].map((orb, i) => (
-        <motion.div key={i}
+        <Motion.div key={i}
           animate={{ y: [0, -20, 0], rotate: [0, 8, 0] }}
           transition={{ duration: orb.dur, repeat: Infinity, ease: 'easeInOut' }}
           style={{
@@ -91,7 +91,7 @@ function InputField({ label, type = 'text', value, onChange, placeholder, error,
 
         {/* Show/Hide Password */}
         {isPassword && (
-          <motion.button
+          <Motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => setShowPass(!showPass)}
             type="button"
@@ -105,14 +105,14 @@ function InputField({ label, type = 'text', value, onChange, placeholder, error,
             }}
           >
             {showPass ? '🙈' : '👁️'}
-          </motion.button>
+          </Motion.button>
         )}
       </div>
 
       {/* Error */}
       <AnimatePresence>
         {error && (
-          <motion.div
+          <Motion.div
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
@@ -123,7 +123,7 @@ function InputField({ label, type = 'text', value, onChange, placeholder, error,
             }}
           >
             ⚠ {error}
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </div>
@@ -204,7 +204,7 @@ export default function Login() {
         pointerEvents: 'none',
       }} />
 
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -218,7 +218,7 @@ export default function Login() {
         }}
       >
         {/* Logo */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -244,12 +244,12 @@ export default function Login() {
           <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
             {isRTL ? 'أهلاً بك مجدداً!' : 'Welcome back!'}
           </p>
-        </motion.div>
+        </Motion.div>
 
         {/* General Error */}
         <AnimatePresence>
           {errors.general && (
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -263,7 +263,7 @@ export default function Login() {
               }}
             >
               ⚠️ {errors.general}
-            </motion.div>
+            </Motion.div>
           )}
         </AnimatePresence>
 
@@ -291,7 +291,7 @@ export default function Login() {
           />
 
           {/* Submit */}
-          <motion.button
+          <Motion.button
             whileHover={{ scale: 1.02, boxShadow: '0 0 40px rgba(108,99,255,0.35)' }}
             whileTap={{ scale: 0.97 }}
             type="submit"
@@ -310,16 +310,16 @@ export default function Login() {
           >
             {loginMutation.isLoading ? (
               <>
-                <motion.span
+                <Motion.span
                   animate={{ rotate: 360 }}
                   transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
-                >⟳</motion.span>
+                >⟳</Motion.span>
                 {isRTL ? 'جاري الدخول...' : 'Signing in...'}
               </>
             ) : (
               <>{t('auth.login_btn')} →</>
             )}
-          </motion.button>
+          </Motion.button>
         </form>
 
         {/* Divider */}
@@ -349,7 +349,7 @@ export default function Login() {
             {t('auth.register_btn')}
           </Link>
         </div>
-      </motion.div>
+      </Motion.div>
     </div>
   );
 }
