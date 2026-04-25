@@ -9,6 +9,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    disabled: true
+  },
   server: {
     host: true,
     port: 5173,
