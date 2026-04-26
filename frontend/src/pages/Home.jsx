@@ -496,7 +496,7 @@ export default function Home() {
                 </h2>
               </div>
               <Link to="/products" style={{ textDecoration: 'none' }}>
-                <motion.button
+                <Motion.button
                   whileHover={{ x: isRTL ? -4 : 4 }}
                   style={{
                     background: 'transparent',
@@ -507,7 +507,7 @@ export default function Home() {
                   }}
                 >
                   {t('home.view_all')} {isRTL ? '←' : '→'}
-                </motion.button>
+                </Motion.button>
               </Link>
             </Motion.div>
 
