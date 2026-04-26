@@ -20,7 +20,7 @@ import NotFound      from './pages/NotFound';
 
 // Protected
 import PrivateRoute  from './components/ui/PrivateRoute';
-import Dashboard     from './pages/Dashboard';
+import Dashboard     from './pages/admin/Dashboard';
 
 export default function App() {
   const { theme } = useThemeStore();
