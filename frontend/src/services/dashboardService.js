@@ -1,23 +1,79 @@
-const DASHBOARD_OVERVIEW_MOCK = {
-  stats: [
-    { key: 'sales', title: 'Total Sales', value: '$124,500', change: 12.4, trend: 'up' },
-    { key: 'orders', title: 'Total Orders', value: '1,284', change: 8.2, trend: 'up' },
-    { key: 'customers', title: 'Total Customers', value: '3,892', change: 3.1, trend: 'up' },
-    { key: 'products', title: 'Total Products', value: '426', change: -1.7, trend: 'down' },
-  ],
-};
+import api from './api';
 
-const MOCK_NETWORK_DELAY = 900;
+function calculateGrowth(currentValue = 0, previousValue = 0) {
+  if (!previousValue) {
+    return currentValue ? 100 : 0;
+  }
 
-export async function getDashboardOverview({ shouldFail = false } = {}) {
-  return new Promise((resolve, reject) => {
-    window.setTimeout(() => {
-      if (shouldFail) {
-        reject(new Error('Unable to load dashboard data. Please try again.'));
-        return;
-      }
-
-      resolve(DASHBOARD_OVERVIEW_MOCK);
-    }, MOCK_NETWORK_DELAY);
-  });
+  return Number((((currentValue - previousValue) / previousValue) * 100).toFixed(2));
 }
+
+function formatCurrency(amount = 0) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+function formatNumber(value = 0) {
+  return new Intl.NumberFormat('en-US').format(value);
+}
+
+function mapDashboardStats(payload) {
+  const revenueThisMonth = payload?.revenue?.this_month ?? 0;
+  const revenueGrowth = payload?.revenue?.growth ?? 0;
+
+  const ordersThisMonth = payload?.orders?.this_month ?? 0;
+  const ordersLastMonth = payload?.orders?.last_month ?? 0;
+
+  const customersThisMonth = payload?.customers?.new_this_month ?? 0;
+  const customersLastMonth = Math.max(
+    (payload?.customers?.total ?? 0) - customersThisMonth,
+    0,
+  );
+
+  return {
+    stats: [
+      {
+        key: 'sales',
+        title: 'Total Sales',
+        value: formatCurrency(revenueThisMonth),
+        change: Number(revenueGrowth),
+        trend: revenueGrowth < 0 ? 'down' : 'up',
+      },
+      {
+        key: 'orders',
+        title: 'Total Orders',
+        value: formatNumber(payload?.orders?.total ?? 0),
+        change: calculateGrowth(ordersThisMonth, ordersLastMonth),
+        trend: ordersThisMonth < ordersLastMonth ? 'down' : 'up',
+      },
+      {
+        key: 'customers',
+        title: 'Total Customers',
+        value: formatNumber(payload?.customers?.total ?? 0),
+        change: calculateGrowth(customersThisMonth, customersLastMonth),
+        trend: customersThisMonth < customersLastMonth ? 'down' : 'up',
+      },
+      {
+        key: 'products',
+        title: 'Total Products',
+        value: formatNumber(payload?.products?.total ?? 0),
+      },
+    ],
+    raw: payload,
+  };
+}
+
+export async function getDashboardOverview() {
+  try {
+    const response = await api.get('/dashboard/stats/');
+    return mapDashboardStats(response.data);
+  } catch (error) {
+    const serverMessage = error?.response?.data?.detail;
+    throw new Error(serverMessage || 'Unable to load dashboard data. Please try again.');
+  }
+}
+
+export default getDashboardOverview;
