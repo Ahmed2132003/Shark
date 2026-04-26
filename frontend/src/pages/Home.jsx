@@ -384,6 +384,12 @@ export default function Home() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
 
+  const normalizeList = (data) => {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.results)) return data.results;
+    return [];
+  };
+
   const { data: categories, isLoading: catsLoading } = useQuery({
     queryKey: ['categories'],
     queryFn:  () => api.get('/products/').then(r => r.data),
@@ -393,6 +399,9 @@ export default function Home() {
     queryKey: ['featured'],
     queryFn:  () => api.get('/products/featured/').then(r => r.data),
   });
+
+  const categoriesList = normalizeList(categories);
+  const featuredList = normalizeList(featured);
 
   return (
     <div>
@@ -443,7 +452,7 @@ export default function Home() {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                 gap: '20px',
               }}>
-                {categories?.map((cat, i) => (
+                {categoriesList.map((cat, i) => (                  
                   <CategoryCard key={cat.id} cat={cat} index={i} />
                 ))}
               </div>
@@ -525,7 +534,7 @@ export default function Home() {
                 gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
                 gap: '24px',
               }}>
-                {featured?.map((product, i) => (
+                {featuredList.map((product, i) => (                  
                   <ProductCard key={product.id} product={product} index={i} t={t} />
                 ))}
               </div>
