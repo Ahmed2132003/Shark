@@ -37,55 +37,76 @@ const api = axios.create({
   },
 });
 
-function isPublicEndpoint(url = '') {
-  const normalized = String(url || '').split('?')[0];
+let refreshPromise = null;
 
-  return (
-    normalized.startsWith('/products/') ||
-    normalized === '/products' ||
-    normalized.startsWith('/cart/') ||
-    normalized === '/cart' ||
-    normalized.startsWith('/auth/login') ||
-    normalized.startsWith('/auth/register') ||
-    normalized.startsWith('/auth/token')
-  );
-}
+async function refreshAccessToken() {
+  if (!refreshPromise) {
+    const refresh = getRefreshToken();
 
-api.interceptors.request.use((config) => {
-  if (isPublicEndpoint(config.url)) {
-    return config;
+    if (!refresh) {
+      throw new Error('Missing refresh token');
+    }
+
+    refreshPromise = axios
+      .post('/api/auth/token/refresh/', { refresh })
+      .then((response) => {
+        const nextAccess = response?.data?.access;
+        if (!nextAccess) {
+          throw new Error('Refresh endpoint did not return access token');
+        }
+
+        persistTokens({ access: nextAccess, refresh });
+        return nextAccess;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
   }
 
-  const token = getAccessToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }  
-  return config;
-});
+  return refreshPromise;
+}
+
+api.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const original = error.config;
+    const originalRequest = error?.config;
+    const status = error?.response?.status;
+    const requestUrl = originalRequest?.url || '';
+    const isRefreshCall = requestUrl.includes('/auth/token/refresh/');
 
-    if (error.response?.status === 401 && !original?._retry) {
-      original._retry = true;
-      const refresh = getRefreshToken();
-
-      if (refresh) {
-        try {
-          const res = await axios.post('/api/auth/token/refresh/', { refresh });
-          persistTokens({ access: res.data.access, refresh });
-          original.headers.Authorization = `Bearer ${res.data.access}`;
-          return api(original);
-        } catch {
-          clearTokens();
-          window.location.href = '/login';
-        }
-      }
+    if (status !== 401 || !originalRequest || originalRequest._retry || isRefreshCall) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    originalRequest._retry = true;
+
+    try {
+      const newAccessToken = await refreshAccessToken();
+      originalRequest.headers = originalRequest.headers || {};
+      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      return api(originalRequest);
+    } catch (refreshError) {
+      clearTokens();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+
+      return Promise.reject(refreshError);
+    }
   },
 );
 

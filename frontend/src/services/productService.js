@@ -1,4 +1,4 @@
-import api from './api';
+import apiClient from './api';
 
 function parseNumber(value, fallback = 0) {
   const parsed = Number(value);
@@ -52,7 +52,7 @@ async function createDefaultVariantIfMissing(productId, payload, existingVariant
     return;
   }
 
-  await api.post(`/products/admin/products/${productId}/add_variant/`, {
+  await apiClient.post(`/products/admin/products/${productId}/add_variant/`, {    
     name: 'Default',
     sku: `${skuBase}-${Date.now()}`,
     price_override: null,
@@ -64,7 +64,7 @@ async function createDefaultVariantIfMissing(productId, payload, existingVariant
 
 export async function getProductCategories() {
   try {
-    const response = await api.get('/products/');
+    const response = await apiClient.get('/products/');    
     return response.data;
   } catch (error) {
     throw new Error(error?.response?.data?.detail || 'Unable to load categories.');
@@ -73,7 +73,7 @@ export async function getProductCategories() {
 
 export async function getProducts() {
   try {
-    const response = await api.get('/products/admin/products/');
+    const response = await apiClient.get('/products/admin/products/');    
     return response.data.map(mapProduct);
   } catch (error) {
     throw new Error(error?.response?.data?.detail || 'Unable to load products.');
@@ -82,9 +82,9 @@ export async function getProducts() {
 
 export async function createProduct(payload) {
   try {
-    const response = await api.post('/products/admin/products/', buildProductPayload(payload));
+    const response = await apiClient.post('/products/admin/products/', buildProductPayload(payload));    
     await createDefaultVariantIfMissing(response.data.id, payload, response.data.variants);
-    const latest = await api.get(`/products/admin/products/${response.data.id}/`);
+    const latest = await apiClient.get(`/products/admin/products/${response.data.id}/`);    
     return mapProduct(latest.data);
   } catch (error) {
     throw new Error(error?.response?.data?.detail || 'Unable to create product.');
@@ -93,13 +93,13 @@ export async function createProduct(payload) {
 
 export async function updateProduct(productId, payload) {
   try {
-    const existingResponse = await api.get(`/products/admin/products/${productId}/`);
+    const existingResponse = await apiClient.get(`/products/admin/products/${productId}/`);    
     const existing = existingResponse.data;
 
-    await api.patch(`/products/admin/products/${productId}/`, buildProductPayload(payload));
+    await apiClient.patch(`/products/admin/products/${productId}/`, buildProductPayload(payload));    
     await createDefaultVariantIfMissing(productId, payload, existing.variants || []);
 
-    const latest = await api.get(`/products/admin/products/${productId}/`);
+    const latest = await apiClient.get(`/products/admin/products/${productId}/`);    
     return mapProduct(latest.data);
   } catch (error) {
     throw new Error(error?.response?.data?.detail || 'Unable to update product.');
@@ -108,7 +108,7 @@ export async function updateProduct(productId, payload) {
 
 export async function deleteProduct(productId) {
   try {
-    await api.delete(`/products/admin/products/${productId}/`);
+    await apiClient.delete(`/products/admin/products/${productId}/`);    
     return { success: true };
   } catch (error) {
     throw new Error(error?.response?.data?.detail || 'Unable to delete product.');
@@ -126,7 +126,7 @@ export async function uploadProductImage(productId, file) {
   formData.append('is_main', 'true');
 
   try {
-    const response = await api.post(`/products/admin/products/${productId}/upload_image/`, formData, {
+    const response = await apiClient.post(`/products/admin/products/${productId}/upload_image/`, formData, {      
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 
