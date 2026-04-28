@@ -23,11 +23,8 @@ function resolveProductImageUrl(rawUrl) {
   const configuredOrigin = import.meta.env.VITE_API_ORIGIN?.trim();
   const apiBaseUrl = api?.defaults?.baseURL || '';
   const absoluteBaseMatch = typeof apiBaseUrl === 'string' ? apiBaseUrl.match(/^https?:\/\/[^/]+/i) : null;
-  const runtimeOrigin =
-    typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'http://localhost:8000';
-  const apiOrigin = configuredOrigin || absoluteBaseMatch?.[0] || runtimeOrigin;  
+  const runtimeOrigin = 'http://localhost:8080';
+  const apiOrigin = configuredOrigin || absoluteBaseMatch?.[0] || runtimeOrigin;
   const mediaBase = import.meta.env.VITE_MEDIA_BASE_URL || `${apiOrigin}/media/`;
 
   if (trimmedUrl.startsWith('/media/')) {
