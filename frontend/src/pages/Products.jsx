@@ -196,6 +196,11 @@ function SkeletonCard() {
 
 // ─── Filter Panel ──────────────────────────────────────────────────────────────
 function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMobile }) {
+  const categoryList = Array.isArray(categories)
+    ? categories
+    : Array.isArray(categories?.results)
+      ? categories.results
+      : [];
 
   const content = (
     <div style={{
@@ -239,7 +244,7 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
           {t('home.categories')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {[{ slug: '', name: isRTL ? 'الكل' : 'All' }, ...(categories || [])].map(cat => (
+          {[{ slug: '', name: isRTL ? 'الكل' : 'All' }, ...categoryList].map(cat => (            
             <Motion.button
               key={cat.slug}
               whileHover={{ x: isRTL ? -4 : 4 }}
