@@ -24,7 +24,7 @@ function resolveProductImageUrl(rawUrl) {
   if (!trimmedUrl) return FALLBACK_IMAGE;
 
   if (
-    /^(https?:)?\/\//i.test(trimmedUrl) ||
+    /^https?:\/\//i.test(trimmedUrl) ||
     trimmedUrl.startsWith('data:') ||
     trimmedUrl.startsWith('blob:')
   ) {
@@ -32,21 +32,19 @@ function resolveProductImageUrl(rawUrl) {
   }
 
   const configuredOrigin = import.meta.env.VITE_API_ORIGIN?.trim();
-  const apiBaseUrl = api?.defaults?.baseURL || '';
-  const absoluteBaseMatch = typeof apiBaseUrl === 'string' ? apiBaseUrl.match(/^https?:\/\/[^/]+/i) : null;
-  const runtimeOrigin =
-    typeof window !== 'undefined' && window.location?.origin
-      ? window.location.origin
-      : 'http://localhost:8000';
-  const apiOrigin = configuredOrigin || absoluteBaseMatch?.[0] || runtimeOrigin;  
-  const mediaBase = import.meta.env.VITE_MEDIA_BASE_URL || `${apiOrigin}/media/`;
+  const apiBaseUrl = typeof api?.defaults?.baseURL === 'string' ? api.defaults.baseURL : '';
+  const absoluteBaseMatch = apiBaseUrl.match(/^https?:\/\/[^/]+/i);
 
-  if (trimmedUrl.startsWith('/media/')) {
-    return `${apiOrigin}${trimmedUrl}`;
-  }
+  // نستخدم backend origin بشكل صح - مش window.location.origin لأنه frontend port
+  const backendOrigin =
+    configuredOrigin ||
+    absoluteBaseMatch?.[0] ||
+    'http://localhost:8000';
+
+  const mediaBase = import.meta.env.VITE_MEDIA_BASE_URL || `${backendOrigin}/media/`;
 
   if (trimmedUrl.startsWith('/')) {
-    return `${apiOrigin}${trimmedUrl}`;
+    return `${backendOrigin}${trimmedUrl}`;
   }
 
   return `${mediaBase.replace(/\/+$/, '')}/${trimmedUrl.replace(/^\/+/, '')}`;
