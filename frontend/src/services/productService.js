@@ -5,6 +5,18 @@ function parseNumber(value, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function ensureArrayPayload(data) {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(data?.results)) {
+    return data.results;
+  }
+
+  return [];
+}
+
 function calculateStock(product) {
   if (!Array.isArray(product?.variants)) {
     return product?.in_stock ? 1 : 0;
@@ -65,7 +77,7 @@ async function createDefaultVariantIfMissing(productId, payload, existingVariant
 export async function getProductCategories() {
   try {
     const response = await apiClient.get('/products/');    
-    return response.data;
+    return ensureArrayPayload(response.data);    
   } catch (error) {
     throw new Error(error?.response?.data?.detail || 'Unable to load categories.');
   }
@@ -74,7 +86,7 @@ export async function getProductCategories() {
 export async function getProducts() {
   try {
     const response = await apiClient.get('/products/admin/products/');    
-    return response.data.map(mapProduct);
+    return ensureArrayPayload(response.data).map(mapProduct);    
   } catch (error) {
     throw new Error(error?.response?.data?.detail || 'Unable to load products.');
   }

@@ -66,7 +66,8 @@ export default function ProductFormModal({
   onClose,
   onSubmit,
 }) {
-  const [values, setValues] = useState(() => getInitialValues(initialProduct));
+  const safeCategories = Array.isArray(categories) ? categories : [];
+  const [values, setValues] = useState(() => getInitialValues(initialProduct));  
   const [errors, setErrors] = useState({});
   const [imageFileName, setImageFileName] = useState('');
 
@@ -125,7 +126,7 @@ export default function ProductFormModal({
               disabled={categoriesLoading}
             >
               <option value="">Uncategorized</option>
-              {categories.map((category) => (
+              {safeCategories.map((category) => (                
                 <option key={category.id} value={category.id}>{category.name}</option>
               ))}
             </select>
