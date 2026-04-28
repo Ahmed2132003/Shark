@@ -67,17 +67,21 @@ function ProductCard({ product, index, t, onAddToCart }) {
     <Motion.article
       layout
       custom={index}
-      whileHover={{ y: -4 }}
-      className="group overflow-hidden rounded-2xl border border-white/10 bg-[#171a2c] shadow-lg shadow-black/10 transition-all hover:border-indigo-400/60 hover:shadow-indigo-500/20"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: index * 0.04 }}
+      whileHover={{ y: -8, scale: 1.01 }}
+      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-[var(--bg-card)] shadow-[var(--shadow-md)] transition-all duration-300 hover:border-indigo-400/60 hover:shadow-[0_20px_55px_rgba(108,99,255,0.22)]"      
     >
+      <div className="pointer-events-none absolute -inset-24 bg-[radial-gradient(circle_at_top,rgba(108,99,255,0.18),transparent_55%)] opacity-0 transition duration-500 group-hover:opacity-100" />
       <Link to={`/products/${product.slug}`} className="block">
-        <div className="relative h-48 w-full overflow-hidden bg-[#121423]">
+        <div className="relative h-52 w-full overflow-hidden bg-[var(--bg-secondary)]">          
           <img
             src={imageSrc}
             alt={product.name}
             loading="lazy"
             onError={() => setImageError(true)}
-            className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="h-52 w-full object-cover transition-transform duration-700 group-hover:scale-110"            
           />
 
           {product.is_featured && (
@@ -93,8 +97,8 @@ function ProductCard({ product, index, t, onAddToCart }) {
           )}
         </div>
 
-        <div className="space-y-3 p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-300">
+        <div className="relative space-y-3 p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-300/90">            
             {product.category?.name || '—'}
           </p>
 
@@ -105,8 +109,8 @@ function ProductCard({ product, index, t, onAddToCart }) {
             {product.name}
           </h3>
 
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-2xl font-extrabold text-indigo-400">
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <p className="text-2xl font-extrabold text-indigo-300">              
               {Number(product.base_price || 0).toLocaleString()} {t('common.egp')}
             </p>
 
@@ -114,7 +118,7 @@ function ProductCard({ product, index, t, onAddToCart }) {
               type="button"
               onClick={handleAdd}
               disabled={!product.in_stock || adding}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-400/60 bg-indigo-500/20 text-lg text-indigo-200 transition hover:bg-indigo-500/35 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-indigo-400/70 bg-indigo-500/20 text-lg text-indigo-200 shadow-[0_0_20px_rgba(108,99,255,0.2)] transition hover:scale-105 hover:bg-indigo-500/35 disabled:cursor-not-allowed disabled:opacity-50"              
             >
               {adding ? '✓' : '🛒'}
             </button>
@@ -135,13 +139,13 @@ function FiltersPanel({ filters, setFilters, categories, isRTL, t }) {
   const resetFilters = () => setFilters(DEFAULT_FILTERS);
 
   return (
-    <aside className="rounded-2xl border border-white/10 bg-[#171a2c] p-5 shadow-lg shadow-black/10 md:sticky md:top-24">
+    <aside className="rounded-3xl border border-white/10 bg-[var(--bg-card)] p-5 shadow-[var(--shadow-md)] backdrop-blur-md md:sticky md:top-24">      
       <div className="mb-5 flex items-center justify-between">
         <h3 className="text-lg font-bold text-white">{t('products.filter')}</h3>
         <button
           type="button"
           onClick={resetFilters}
-          className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-indigo-400/50 hover:text-indigo-200"
+          className="rounded-xl border border-white/15 px-3 py-1.5 text-xs font-medium text-slate-300 transition duration-200 hover:-translate-y-0.5 hover:border-indigo-400/50 hover:text-indigo-200"          
         >
           {isRTL ? 'إعادة ضبط' : 'Reset'}
         </button>
@@ -157,10 +161,10 @@ function FiltersPanel({ filters, setFilters, categories, isRTL, t }) {
                 key={cat.slug || 'all'}
                 type="button"
                 onClick={() => setFilters((prev) => ({ ...prev, category: cat.slug }))}
-                className={`w-full rounded-xl border px-3 py-2 text-sm font-medium transition ${
+                className={`w-full rounded-xl border px-3 py-2 text-sm font-medium transition duration-300 ${                  
                   filters.category === cat.slug
-                    ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200'
-                    : 'border-white/10 bg-[#111324] text-slate-300 hover:border-indigo-400/60'
+                    ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200 shadow-[0_0_18px_rgba(108,99,255,0.2)]'
+                    : 'border-white/10 bg-[var(--bg-secondary)] text-slate-300 hover:border-indigo-400/60'                    
                 }`}
               >
                 {cat.name}
@@ -177,19 +181,19 @@ function FiltersPanel({ filters, setFilters, categories, isRTL, t }) {
               placeholder={isRTL ? 'من' : 'Min'}
               value={filters.min_price}
               onChange={(event) => setFilters((prev) => ({ ...prev, min_price: event.target.value }))}
-              className="w-full rounded-xl border border-white/10 bg-[#111324] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-[var(--bg-secondary)] px-3 py-2 text-sm text-white placeholder:text-slate-500 transition duration-200 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"              
             />
             <input
               type="number"
               placeholder={isRTL ? 'إلى' : 'Max'}
               value={filters.max_price}
               onChange={(event) => setFilters((prev) => ({ ...prev, max_price: event.target.value }))}
-              className="w-full rounded-xl border border-white/10 bg-[#111324] px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
+              className="w-full rounded-xl border border-white/10 bg-[var(--bg-secondary)] px-3 py-2 text-sm text-white placeholder:text-slate-500 transition duration-200 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"              
             />
           </div>
         </section>
 
-        <label className="flex cursor-pointer items-center justify-between rounded-xl border border-white/10 bg-[#111324] px-3 py-2.5">
+        <label className="flex cursor-pointer items-center justify-between rounded-xl border border-white/10 bg-[var(--bg-secondary)] px-3 py-2.5">        
           <span className="text-sm font-medium text-slate-200">{t('products.in_stock')}</span>
           <input
             type="checkbox"
@@ -267,14 +271,14 @@ export default function Products() {
   ];
 
   return (
-    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-10">
+    <div className="min-h-screen bg-[var(--bg-primary)] px-4 py-8 sm:px-6 lg:px-10">      
       <div className="mx-auto max-w-7xl space-y-6">
         <header className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">{t('nav.products')}</p>
           <h1 className="text-3xl font-extrabold text-white sm:text-4xl">{t('products.title')}</h1>
         </header>
 
-        <section className="rounded-2xl border border-white/10 bg-[#171a2c] p-4">
+        <section className="rounded-3xl border border-white/10 bg-[var(--bg-card)] p-4 shadow-[var(--shadow-md)]">        
           <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
             <div className="relative">
               <span
@@ -289,7 +293,7 @@ export default function Products() {
                 placeholder={t('products.search')}
                 value={filters.search}
                 onChange={(event) => setFilters((prev) => ({ ...prev, search: event.target.value }))}
-                className={`w-full rounded-xl border border-white/10 bg-[#111324] py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none ${
+                className={`w-full rounded-2xl border border-white/10 bg-[var(--bg-secondary)] py-2.5 text-sm text-white placeholder:text-slate-500 transition duration-200 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${                  
                   isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'
                 }`}
               />
@@ -298,7 +302,7 @@ export default function Products() {
             <select
               value={filters.ordering}
               onChange={(event) => setFilters((prev) => ({ ...prev, ordering: event.target.value }))}
-              className="rounded-xl border border-white/10 bg-[#111324] px-3 py-2.5 text-sm text-white focus:border-indigo-400 focus:outline-none"
+              className="rounded-2xl border border-white/10 bg-[var(--bg-secondary)] px-3 py-2.5 text-sm text-white transition duration-200 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"              
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -330,7 +334,7 @@ export default function Products() {
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-white/10 bg-[#171a2c] px-6 py-14 text-center text-slate-300">
+              <div className="rounded-3xl border border-dashed border-white/10 bg-[var(--bg-card)] px-6 py-14 text-center text-slate-300">                
                 <p className="text-4xl">🔍</p>
                 <p className="mt-3 text-lg font-semibold text-white">{t('products.no_products')}</p>
                 <button
