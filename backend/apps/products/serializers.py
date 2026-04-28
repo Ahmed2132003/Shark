@@ -72,10 +72,11 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Product
         fields = [
-            'name', 'category', 'description',
+            'id', 'name', 'category', 'description',
             'base_price', 'is_active', 'is_featured'
         ]
-
+        read_only_fields = ['id']
+        
     def validate_base_price(self, value):
         if value <= 0:
             raise serializers.ValidationError("Price must be greater than 0.")
