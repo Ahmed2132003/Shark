@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { motion as Motion } from 'framer-motion';
 import api from '../services/api';
 
 const DEFAULT_FILTERS = {
@@ -45,6 +45,20 @@ function resolveProductImageUrl(rawUrl) {
   return `${mediaBase.replace(/\/+$/, '')}/${trimmedUrl.replace(/^\/+/, '')}`;
 }
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] },
+  }),
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } },
+};
+
 function ProductCard({ product, index, t, onAddToCart }) {
   const [adding, setAdding] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -54,181 +68,450 @@ function ProductCard({ product, index, t, onAddToCart }) {
     return resolveProductImageUrl(product.main_image);
   }, [imageError, product.main_image]);
 
-  const handleAdd = async (event) => {
-    event.preventDefault();
-    if (!product.in_stock || adding) return;
-
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!product.in_stock) return;
     setAdding(true);
     await onAddToCart(product);
-    setTimeout(() => setAdding(false), 700);
+    setTimeout(() => setAdding(false), 800);
   };
 
   return (
-    <Motion.article
+    <Motion.div
       layout
+      variants={fadeUp}
       custom={index}
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.04 }}
-      whileHover={{ y: -8, scale: 1.01 }}
-      className="group relative overflow-hidden rounded-3xl border border-white/10 bg-[var(--bg-card)] shadow-[var(--shadow-md)] transition-all duration-300 hover:border-indigo-400/60 hover:shadow-[0_20px_55px_rgba(108,99,255,0.22)]"      
+      whileHover={{ y: -6 }}
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        position: 'relative',
+        transition: 'border-color 0.3s',
+      }}
+      onHoverStart={(e) => {
+        e.currentTarget.style.borderColor = 'var(--accent)';
+      }}
+      onHoverEnd={(e) => {
+        e.currentTarget.style.borderColor = 'var(--border)';
+      }}
     >
-      <div className="pointer-events-none absolute -inset-24 bg-[radial-gradient(circle_at_top,rgba(108,99,255,0.18),transparent_55%)] opacity-0 transition duration-500 group-hover:opacity-100" />
-      <Link to={`/products/${product.slug}`} className="block">
-        <div className="relative h-52 w-full overflow-hidden bg-[var(--bg-secondary)]">          
-          <img
+      <Link to={`/products/${product.slug}`} style={{ textDecoration: 'none' }}>
+        <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/3' }}>
+          <Motion.img
             src={imageSrc}
             alt={product.name}
-            loading="lazy"
+            whileHover={{ scale: 1.08 }}
+            transition={{ duration: 0.5 }}
             onError={() => setImageError(true)}
-            className="h-52 w-full object-cover transition-transform duration-700 group-hover:scale-110"            
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
 
           {product.is_featured && (
-            <span className="absolute left-3 top-3 rounded-full bg-indigo-500/90 px-3 py-1 text-xs font-semibold text-white">
-              Featured
-            </span>
+            <div
+              style={{
+                position: 'absolute',
+                top: '12px',
+                left: '12px',
+                background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
+                color: 'white',
+                borderRadius: '8px',
+                padding: '4px 12px',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '1px',
+              }}
+            >
+              ✦ FEATURED
+            </div>
           )}
 
           {!product.in_stock && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/55 text-sm font-semibold text-white">
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(0,0,0,0.55)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 700,
+                fontSize: '15px',
+                letterSpacing: '1px',
+              }}
+            >
               {t('products.out_of_stock')}
             </div>
           )}
         </div>
 
-        <div className="relative space-y-3 p-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-indigo-300/90">            
-            {product.category?.name || '—'}
-          </p>
+        <div style={{ padding: '20px' }}>
+          <div
+            style={{
+              fontSize: '11px',
+              color: 'var(--accent)',
+              fontWeight: 700,
+              marginBottom: '8px',
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+            }}
+          >
+            {product.category?.name}
+          </div>
 
-          <h3
-            className="min-h-[48px] text-base font-bold text-white"
-            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: '15px',
+              color: 'var(--text-primary)',
+              marginBottom: '16px',
+              lineHeight: 1.4,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
           >
             {product.name}
-          </h3>
+          </div>
 
-          <div className="flex items-center justify-between gap-3 pt-1">
-            <p className="text-2xl font-extrabold text-indigo-300">              
-              {Number(product.base_price || 0).toLocaleString()} {t('common.egp')}
-            </p>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '20px',
+                fontWeight: 800,
+                background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              {Number(product.base_price).toLocaleString()} {t('common.egp')}
+            </div>
 
-            <button
-              type="button"
+            <Motion.button
               onClick={handleAdd}
-              disabled={!product.in_stock || adding}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-indigo-400/70 bg-indigo-500/20 text-lg text-indigo-200 shadow-[0_0_20px_rgba(108,99,255,0.2)] transition hover:scale-105 hover:bg-indigo-500/35 disabled:cursor-not-allowed disabled:opacity-50"              
+              whileHover={{ scale: product.in_stock ? 1.1 : 1 }}
+              whileTap={{ scale: product.in_stock ? 0.9 : 1 }}
+              animate={adding ? { rotate: [0, -10, 10, 0] } : {}}
+              style={{
+                width: '40px',
+                height: '40px',
+                background: adding
+                  ? 'var(--success)'
+                  : product.in_stock
+                    ? 'var(--accent-glow)'
+                    : 'var(--bg-hover)',
+                border: `1px solid ${
+                  adding
+                    ? 'var(--success)'
+                    : product.in_stock
+                      ? 'var(--accent)'
+                      : 'var(--border)'
+                }`,
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '18px',
+                cursor: product.in_stock ? 'pointer' : 'not-allowed',
+                transition: 'background 0.3s, border 0.3s',
+                flexShrink: 0,
+              }}
             >
               {adding ? '✓' : '🛒'}
-            </button>
+            </Motion.button>
           </div>
         </div>
       </Link>
-    </Motion.article>
+    </Motion.div>
   );
 }
 
-function FiltersPanel({ filters, setFilters, categories, isRTL, t }) {
+function SkeletonCard() {
+  return (
+    <Motion.div
+      animate={{ opacity: [0.5, 1, 0.5] }}
+      transition={{ duration: 1.5, repeat: Infinity }}
+      style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        borderRadius: '20px',
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{ height: '200px', background: 'var(--bg-hover)' }} />
+      <div style={{ padding: '20px' }}>
+        {[40, 70, 30].map((w, i) => (
+          <div
+            key={i}
+            style={{
+              height: i === 1 ? '18px' : '14px',
+              width: `${w}%`,
+              background: 'var(--bg-hover)',
+              borderRadius: '8px',
+              marginBottom: i < 2 ? '12px' : 0,
+            }}
+          />
+        ))}
+      </div>
+    </Motion.div>
+  );
+}
+
+function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMobile }) {
   const categoryList = Array.isArray(categories)
     ? categories
     : Array.isArray(categories?.results)
       ? categories.results
       : [];
 
-  const resetFilters = () => setFilters(DEFAULT_FILTERS);
+  const content = (
+    <div
+      style={{
+        background: isMobile ? 'var(--bg-secondary)' : 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        borderRadius: isMobile ? '24px 24px 0 0' : '20px',
+        padding: '28px',
+        position: isMobile ? 'fixed' : 'sticky',
+        bottom: isMobile ? 0 : 'auto',
+        left: isMobile ? 0 : 'auto',
+        right: isMobile ? 0 : 'auto',
+        top: isMobile ? 'auto' : '90px',
+        zIndex: isMobile ? 200 : 1,
+        maxHeight: isMobile ? '80vh' : 'calc(100vh - 110px)',
+        overflowY: 'auto',
+        width: '100%',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '28px',
+        }}
+      >
+        <h3 style={{ fontWeight: 800, fontSize: '18px', color: 'var(--text-primary)' }}>{t('products.filter')}</h3>
+        {isMobile && (
+          <button
+            onClick={onClose}
+            style={{
+              background: 'var(--bg-hover)',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '6px 12px',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              fontSize: '18px',
+            }}
+          >
+            ✕
+          </button>
+        )}
+      </div>
 
-  return (
-    <aside className="rounded-3xl border border-white/10 bg-[var(--bg-card)] p-5 shadow-[var(--shadow-md)] backdrop-blur-md md:sticky md:top-24">      
-      <div className="mb-5 flex items-center justify-between">
-        <h3 className="text-lg font-bold text-white">{t('products.filter')}</h3>
-        <button
-          type="button"
-          onClick={resetFilters}
-          className="rounded-xl border border-white/15 px-3 py-1.5 text-xs font-medium text-slate-300 transition duration-200 hover:-translate-y-0.5 hover:border-indigo-400/50 hover:text-indigo-200"          
+      <div style={{ marginBottom: '28px' }}>
+        <div
+          style={{
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '2px',
+            color: 'var(--text-muted)',
+            marginBottom: '14px',
+            textTransform: 'uppercase',
+          }}
         >
-          {isRTL ? 'إعادة ضبط' : 'Reset'}
-        </button>
+          {t('home.categories')}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {[{ slug: '', name: isRTL ? 'الكل' : 'All' }, ...categoryList].map((cat) => (
+            <Motion.button
+              key={cat.slug || 'all'}
+              whileHover={{ x: isRTL ? -4 : 4 }}
+              onClick={() => setFilters((f) => ({ ...f, category: cat.slug }))}
+              style={{
+                background: filters.category === cat.slug ? 'var(--accent-glow)' : 'transparent',
+                border:
+                  filters.category === cat.slug ? '1px solid var(--accent)' : '1px solid transparent',
+                borderRadius: '12px',
+                padding: '10px 14px',
+                color: filters.category === cat.slug ? 'var(--accent)' : 'var(--text-secondary)',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '14px',
+                textAlign: isRTL ? 'right' : 'left',
+                width: '100%',
+                transition: 'all 0.2s',
+              }}
+            >
+              {cat.name}
+            </Motion.button>
+          ))}
+        </div>
       </div>
 
-      <div className="space-y-6">
-        <section>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{t('home.categories')}</p>
-          <div className="space-y-2">
-            {[{ slug: '', name: isRTL ? 'الكل' : 'All' }, ...categoryList].map((cat) => (
-              <Motion.button
-                whileHover={{ x: isRTL ? -2 : 2 }}
-                key={cat.slug || 'all'}
-                type="button"
-                onClick={() => setFilters((prev) => ({ ...prev, category: cat.slug }))}
-                className={`w-full rounded-xl border px-3 py-2 text-sm font-medium transition duration-300 ${                  
-                  filters.category === cat.slug
-                    ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200 shadow-[0_0_18px_rgba(108,99,255,0.2)]'
-                    : 'border-white/10 bg-[var(--bg-secondary)] text-slate-300 hover:border-indigo-400/60'                    
-                }`}
+      <div style={{ marginBottom: '28px' }}>
+        <div
+          style={{
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '2px',
+            color: 'var(--text-muted)',
+            marginBottom: '14px',
+            textTransform: 'uppercase',
+          }}
+        >
+          {t('products.price')}
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {[
+            { key: 'min_price', placeholder: isRTL ? 'من' : 'Min' },
+            { key: 'max_price', placeholder: isRTL ? 'إلى' : 'Max' },
+          ].map(({ key, placeholder }) => (
+            <input
+              key={key}
+              type="number"
+              placeholder={placeholder}
+              value={filters[key]}
+              onChange={(e) => setFilters((f) => ({ ...f, [key]: e.target.value }))}
+              style={{
+                flex: 1,
+                background: 'var(--bg-primary)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '10px 14px',
+                color: 'var(--text-primary)',
+                fontSize: '14px',
+                outline: 'none',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '28px' }}>
+        <Motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => setFilters((f) => ({ ...f, in_stock: !f.in_stock }))}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            width: '100%',
+            padding: 0,
+          }}
+        >
+          <div
+            style={{
+              width: '22px',
+              height: '22px',
+              background: filters.in_stock ? 'var(--accent)' : 'var(--bg-primary)',
+              border: `2px solid ${filters.in_stock ? 'var(--accent)' : 'var(--border)'}`,
+              borderRadius: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s',
+              flexShrink: 0,
+            }}
+          >
+            {filters.in_stock && (
+              <Motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                style={{ color: 'white', fontSize: '12px', fontWeight: 700 }}
               >
-                {cat.name}
-              </Motion.button>
-            ))}
+                ✓
+              </Motion.span>
+            )}
           </div>
-        </section>
-
-        <section>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{t('products.price')}</p>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              placeholder={isRTL ? 'من' : 'Min'}
-              value={filters.min_price}
-              onChange={(event) => setFilters((prev) => ({ ...prev, min_price: event.target.value }))}
-              className="w-full rounded-xl border border-white/10 bg-[var(--bg-secondary)] px-3 py-2 text-sm text-white placeholder:text-slate-500 transition duration-200 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"              
-            />
-            <input
-              type="number"
-              placeholder={isRTL ? 'إلى' : 'Max'}
-              value={filters.max_price}
-              onChange={(event) => setFilters((prev) => ({ ...prev, max_price: event.target.value }))}
-              className="w-full rounded-xl border border-white/10 bg-[var(--bg-secondary)] px-3 py-2 text-sm text-white placeholder:text-slate-500 transition duration-200 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"              
-            />
-          </div>
-        </section>
-
-        <label className="flex cursor-pointer items-center justify-between rounded-xl border border-white/10 bg-[var(--bg-secondary)] px-3 py-2.5">        
-          <span className="text-sm font-medium text-slate-200">{t('products.in_stock')}</span>
-          <input
-            type="checkbox"
-            checked={filters.in_stock}
-            onChange={() => setFilters((prev) => ({ ...prev, in_stock: !prev.in_stock }))}
-            className="h-4 w-4 accent-indigo-500"
-          />
-        </label>
+          <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '14px' }}>
+            {t('products.in_stock')}
+          </span>
+        </Motion.button>
       </div>
-    </aside>
-  );
-}
 
-function SkeletonCard() {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#171a2c]">
-      <div className="h-48 animate-pulse bg-[#20253a]" />
-      <div className="space-y-3 p-4">
-        <div className="h-3 w-1/3 animate-pulse rounded bg-[#20253a]" />
-        <div className="h-4 w-4/5 animate-pulse rounded bg-[#20253a]" />
-        <div className="h-4 w-1/2 animate-pulse rounded bg-[#20253a]" />
-      </div>
+      <Motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={() => setFilters(DEFAULT_FILTERS)}
+        style={{
+          width: '100%',
+          background: 'var(--bg-hover)',
+          border: '1px solid var(--border)',
+          borderRadius: '14px',
+          padding: '12px',
+          color: 'var(--text-secondary)',
+          cursor: 'pointer',
+          fontWeight: 600,
+          fontSize: '14px',
+        }}
+      >
+        {isRTL ? '↺ إعادة ضبط' : '↺ Reset Filters'}
+      </Motion.button>
     </div>
   );
+
+  if (isMobile) {
+    return (
+      <AnimatePresence>
+        <Motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 199,
+          }}
+        />
+        <Motion.div
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+          style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200 }}
+        >
+          {content}
+        </Motion.div>
+      </AnimatePresence>
+    );
+  }
+
+  return content;
 }
 
 export default function Products() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
   const [searchParams] = useSearchParams();
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
   const [filters, setFilters] = useState({
     ...DEFAULT_FILTERS,
     category: searchParams.get('category') || '',
   });
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const queryParams = useMemo(() => {
     const params = new URLSearchParams();
@@ -243,19 +526,18 @@ export default function Products() {
 
   const { data: productsData, isLoading } = useQuery({
     queryKey: ['products', queryParams],
-    queryFn: () => api.get(`/products/items/?${queryParams}`).then((response) => response.data),
+    queryFn: () => api.get(`/products/items/?${queryParams}`).then((r) => r.data),
     keepPreviousData: true,
   });
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => api.get('/products/').then((response) => response.data),
+    queryFn: () => api.get('/products/').then((r) => r.data),
   });
 
   const handleAddToCart = async (product) => {
     const firstVariant = product.variants?.[0];
     if (!firstVariant) return;
-
     try {
       await api.post('/cart/add/', { variant_id: firstVariant.id, quantity: 1 });
     } catch (error) {
@@ -271,96 +553,253 @@ export default function Products() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] px-4 py-8 sm:px-6 lg:px-10">      
-      <div className="mx-auto max-w-7xl space-y-6">
-        <header className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">{t('nav.products')}</p>
-          <h1 className="text-3xl font-extrabold text-white sm:text-4xl">{t('products.title')}</h1>
-        </header>
+    <div style={{ minHeight: '100vh', padding: '40px 5%' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        <Motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          style={{ marginBottom: '40px' }}
+        >
+          <div
+            style={{
+              fontSize: '11px',
+              color: 'var(--accent)',
+              fontWeight: 700,
+              letterSpacing: '3px',
+              marginBottom: '12px',
+              textTransform: 'uppercase',
+            }}
+          >
+            ✦ {t('nav.products')}
+          </div>
+          <h1
+            style={{
+              fontSize: 'clamp(32px, 5vw, 56px)',
+              fontWeight: 800,
+              color: 'var(--text-primary)',
+              fontFamily: "'Syne', 'Cairo', sans-serif",
+            }}
+          >
+            {t('products.title')}
+          </h1>
+        </Motion.div>
 
-        <section className="rounded-3xl border border-white/10 bg-[var(--bg-card)] p-4 shadow-[var(--shadow-md)]">        
-          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
-            <div className="relative">
-              <span
-                className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-slate-400 ${
-                  isRTL ? 'right-3' : 'left-3'
-                }`}
-              >
-                🔍
-              </span>
-              <input
-                type="text"
-                placeholder={t('products.search')}
-                value={filters.search}
-                onChange={(event) => setFilters((prev) => ({ ...prev, search: event.target.value }))}
-                className={`w-full rounded-2xl border border-white/10 bg-[var(--bg-secondary)] py-2.5 text-sm text-white placeholder:text-slate-500 transition duration-200 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${                  
-                  isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'
-                }`}
-              />
+        <Motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          style={{
+            display: 'flex',
+            gap: '12px',
+            marginBottom: '32px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: '240px', position: 'relative' }}>
+            <span
+              style={{
+                position: 'absolute',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                [isRTL ? 'right' : 'left']: '16px',
+                color: 'var(--text-muted)',
+                fontSize: '18px',
+                pointerEvents: 'none',
+              }}
+            >
+              🔍
+            </span>
+            <input
+              type="text"
+              placeholder={t('products.search')}
+              value={filters.search}
+              onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+              style={{
+                width: '100%',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border)',
+                borderRadius: '14px',
+                padding: isRTL ? '14px 48px 14px 16px' : '14px 16px 14px 48px',
+                color: 'var(--text-primary)',
+                fontSize: '15px',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'var(--accent)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'var(--border)';
+              }}
+            />
+          </div>
+
+          <select
+            value={filters.ordering}
+            onChange={(e) => setFilters((f) => ({ ...f, ordering: e.target.value }))}
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border)',
+              borderRadius: '14px',
+              padding: '14px 20px',
+              color: 'var(--text-primary)',
+              fontSize: '14px',
+              cursor: 'pointer',
+              outline: 'none',
+              fontWeight: 600,
+              minWidth: '180px',
+            }}
+          >
+            {sortOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+
+          {isMobile && (
+            <Motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setFilterOpen(true)}
+              style={{
+                background: 'var(--accent-glow)',
+                border: '1px solid var(--accent)',
+                borderRadius: '14px',
+                padding: '14px 20px',
+                color: 'var(--accent)',
+                fontWeight: 700,
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              ⚙️ {t('products.filter')}
+            </Motion.button>
+          )}
+        </Motion.div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '260px 1fr',
+            gap: '32px',
+            alignItems: 'start',
+          }}
+        >
+          {!isMobile && !isRTL && (
+            <FilterPanel filters={filters} setFilters={setFilters} categories={categories} t={t} isRTL={isRTL} />
+          )}
+
+          <div>
+            <div
+              style={{
+                color: 'var(--text-muted)',
+                fontSize: '14px',
+                marginBottom: '24px',
+                fontWeight: 600,
+              }}
+            >
+              {isLoading ? '...' : `${products.length} ${isRTL ? 'منتج' : 'products'}`}
             </div>
 
-            <select
-              value={filters.ordering}
-              onChange={(event) => setFilters((prev) => ({ ...prev, ordering: event.target.value }))}
-              className="rounded-2xl border border-white/10 bg-[var(--bg-secondary)] px-3 py-2.5 text-sm text-white transition duration-200 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"              
-            >
-              {sortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </section>
-
-        <div className="grid items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
-          <FiltersPanel
-            filters={filters}
-            setFilters={setFilters}
-            categories={categories}
-            isRTL={isRTL}
-            t={t}
-          />
-
-          <section className="space-y-4">
-            <p className="text-sm font-medium text-slate-400">
-              {isLoading ? '...' : `${products.length} ${isRTL ? 'منتج' : 'products'}`}
-            </p>
-
             {isLoading ? (
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {[...Array(6)].map((_, index) => (
-                  <SkeletonCard key={index} />
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                  gap: '20px',
+                }}
+              >
+                {[...Array(6)].map((_, i) => (
+                  <SkeletonCard key={i} />
                 ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/10 bg-[var(--bg-card)] px-6 py-14 text-center text-slate-300">                
-                <p className="text-4xl">🔍</p>
-                <p className="mt-3 text-lg font-semibold text-white">{t('products.no_products')}</p>
-                <button
-                  type="button"
-                  onClick={() => setFilters(DEFAULT_FILTERS)}
-                  className="mt-5 rounded-xl border border-indigo-400/70 bg-indigo-500/20 px-4 py-2 text-sm font-semibold text-indigo-200 transition hover:bg-indigo-500/30"
+              <Motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                  textAlign: 'center',
+                  padding: '80px 20px',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                <div style={{ fontSize: '64px', marginBottom: '16px' }}>🔍</div>
+                <div
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 700,
+                    marginBottom: '8px',
+                    color: 'var(--text-secondary)',
+                  }}
                 >
-                  {isRTL ? 'إعادة ضبط الفلاتر' : 'Reset filters'}
-                </button>
-              </div>
+                  {t('products.no_products')}
+                </div>
+                <Motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setFilters(DEFAULT_FILTERS)}
+                  style={{
+                    marginTop: '24px',
+                    background: 'var(--accent-glow)',
+                    border: '1px solid var(--accent)',
+                    borderRadius: '14px',
+                    padding: '12px 28px',
+                    color: 'var(--accent)',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  {isRTL ? '↺ إعادة ضبط الفلتر' : '↺ Reset Filters'}
+                </Motion.button>
+              </Motion.div>
             ) : (
-              <Motion.div layout className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {products.map((product, index) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    index={index}
-                    t={t}
-                    onAddToCart={handleAddToCart}
-                  />
-                ))}
+              <Motion.div
+                variants={stagger}
+                initial="hidden"
+                animate="visible"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                  gap: '20px',
+                }}
+              >
+                <AnimatePresence>
+                  {products.map((product, i) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      index={i}
+                      t={t}
+                      onAddToCart={handleAddToCart}
+                    />
+                  ))}
+                </AnimatePresence>
               </Motion.div>
             )}
-          </section>
+          </div>
+
+          {!isMobile && isRTL && (
+            <FilterPanel filters={filters} setFilters={setFilters} categories={categories} t={t} isRTL={isRTL} />
+          )}
         </div>
       </div>
+
+      {isMobile && filterOpen && (
+        <FilterPanel
+          filters={filters}
+          setFilters={setFilters}
+          categories={categories}
+          t={t}
+          isRTL={isRTL}
+          onClose={() => setFilterOpen(false)}
+          isMobile
+        />
+      )}
     </div>
   );
 }
