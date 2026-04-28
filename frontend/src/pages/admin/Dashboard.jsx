@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import StatsCard from '../../components/dashboard/StatsCard';
 import ProductTable from '../../components/products/ProductTable';
@@ -48,39 +48,30 @@ export default function Dashboard() {
     retry: 1,
   });
 
-  const [products, setProducts] = useState([]);
-  const [productsLoading, setProductsLoading] = useState(true);
-  const [productsError, setProductsError] = useState('');
   const [feedback, setFeedback] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [activeProduct, setActiveProduct] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const {
+    data: products = [],
+    isLoading: productsLoading,
+    isError: productsQueryError,
+    error: productsError,
+    refetch: refetchProducts,
+  } = useQuery({
+    queryKey: ['admin-products'],
+    queryFn: () => getProducts(),
+    retry: 1,
+  });
+
   const sortedProducts = useMemo(
     () => [...products].sort((a, b) => a.name.localeCompare(b.name)),
     [products],
   );
 
-  const loadProducts = useCallback(async () => {
-    setProductsLoading(true);
-    setProductsError('');
-
-    try {
-      const response = await getProducts();
-      setProducts(response);
-    } catch (productsRequestError) {
-      setProductsError(productsRequestError instanceof Error ? productsRequestError.message : 'Unable to load products.');
-    } finally {
-      setProductsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadProducts();
-  }, [loadProducts]);
-
-  const openAddModal = () => {
+  const openAddModal = () => {  
     setModalMode('add');
     setActiveProduct(null);
     setIsModalOpen(true);
@@ -118,7 +109,7 @@ export default function Dashboard() {
         await uploadProductImage(savedProduct.id, payload.imageFile);
       }
 
-      await loadProducts();
+      await refetchProducts();      
       setIsModalOpen(false);
     } catch (submitError) {
       setFeedback({
@@ -139,7 +130,7 @@ export default function Dashboard() {
 
     try {
       await deleteProduct(product.id);
-      setProducts((prev) => prev.filter((item) => item.id !== product.id));
+      await refetchProducts();      
       setFeedback({ type: 'success', message: 'Product deleted successfully.' });
     } catch (deleteError) {
       setFeedback({
@@ -194,13 +185,13 @@ export default function Dashboard() {
           </div>
         )}
 
-        {(productsError || categoriesError) && (
+        {(productsQueryError || categoriesError) && (        
           <div className="dashboard-error" role="alert">
-            <p>{productsError || 'Unable to load categories.'}</p>
+            <p>{(productsError instanceof Error ? productsError.message : '') || 'Unable to load categories.'}</p>            
           </div>
         )}
 
-        {!productsError && (
+        {!productsQueryError && (          
           <ProductTable
             products={sortedProducts}
             loading={productsLoading}
