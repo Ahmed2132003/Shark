@@ -427,10 +427,52 @@
   gap: 8px;
 }
 
-.categories-management__panel-actions .ghost {
-  border: 1px solid var(--border);
+.categories-management__panel-actions button {
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 10px 14px;
+  min-height: 40px;
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.categories-management__panel-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.categories-management__panel-actions button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.categories-management__panel-cancel {
+  border-color: var(--border);
   background: transparent;
   color: var(--text-primary);
+}
+
+.categories-management__panel-cancel:hover:not(:disabled) {
+  background: var(--bg-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.categories-management__panel-save {
+  background: var(--accent);
+  color: #fff;
+}
+
+.categories-management__panel-save:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.categories-management__panel-actions button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .categories-management__panel--danger {
