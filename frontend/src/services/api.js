@@ -30,8 +30,10 @@ export function clearTokens() {
   localStorage.removeItem('refresh');
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,  
   headers: {
     'Content-Type': 'application/json',
   },
@@ -47,8 +49,8 @@ async function refreshAccessToken() {
       throw new Error('Missing refresh token');
     }
 
-    refreshPromise = axios
-      .post('/api/auth/token/refresh/', { refresh })
+    refreshPromise = api
+      .post('/auth/token/refresh/', { refresh })      
       .then((response) => {
         const nextAccess = response?.data?.access;
         if (!nextAccess) {
