@@ -1,0 +1,406 @@
+.orders-page {
+  width: min(1200px, 100% - 48px);
+  margin: 32px auto 48px;
+  display: grid;
+  gap: 18px;
+}
+
+.orders-page__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.orders-page__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+}
+
+.orders-page__subtitle {
+  margin-top: 6px;
+  color: var(--text-secondary);
+}
+
+.orders-surface {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
+}
+
+.orders-filters {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(240px, 1.4fr) repeat(2, minmax(180px, 1fr));
+}
+
+.orders-input,
+.orders-select {
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
+  color: var(--text-primary);
+  padding: 0 12px;
+  outline: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.orders-input::placeholder {
+  color: var(--text-muted);
+}
+
+.orders-input:focus,
+.orders-select:focus {
+  border-color: color-mix(in srgb, var(--accent) 75%, white);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+  transform: translateY(-1px);
+}
+
+.orders-refresh {
+  font-size: 0.9rem;
+  color: color-mix(in srgb, var(--accent) 75%, white);
+}
+
+.orders-error {
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--danger) 45%, var(--border));
+  background: color-mix(in srgb, var(--danger) 10%, var(--bg-card));
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.orders-btn {
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.orders-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-hover);
+}
+
+.orders-btn--primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.orders-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 880px;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 12px;
+  text-align: start;
+  border-bottom: 1px solid var(--border);
+}
+
+.orders-table th {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+  background: color-mix(in srgb, var(--bg-secondary) 75%, transparent);
+}
+
+.orders-table tr {
+  transition: background 0.2s ease;
+}
+
+.orders-table tbody tr:hover {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.orders-muted {
+  color: var(--text-secondary);
+}
+
+.orders-link {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.orders-link:hover {
+  color: var(--accent-hover);
+}
+
+.orders-empty,
+.orders-skeleton-row {
+  border-radius: 14px;
+  border: 1px dashed var(--border);
+  background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
+  padding: 28px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.orders-skeleton {
+  display: grid;
+  gap: 10px;
+}
+
+.orders-skeleton-row {
+  height: 54px;
+  padding: 0;
+  animation: shimmer 1.2s linear infinite;
+  background: linear-gradient(110deg, var(--bg-hover) 30%, var(--border) 45%, var(--bg-hover) 60%);
+  background-size: 200% 100%;
+  border-style: solid;
+}
+
+.status-badge {
+  display: inline-flex;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.status-badge--pending { background: color-mix(in srgb, var(--warning) 16%, transparent); border-color: color-mix(in srgb, var(--warning) 38%, var(--border)); color: #fbbf24; }
+.status-badge--processing { background: rgb(56 189 248 / 14%); border-color: rgb(56 189 248 / 34%); color: #7dd3fc; }
+.status-badge--shipped { background: color-mix(in srgb, var(--accent) 16%, transparent); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); color: #c4b5fd; }
+.status-badge--delivered { background: color-mix(in srgb, var(--success) 14%, transparent); border-color: color-mix(in srgb, var(--success) 35%, var(--border)); color: #6ee7b7; }
+.status-badge--cancelled { background: color-mix(in srgb, var(--danger) 14%, transparent); border-color: color-mix(in srgb, var(--danger) 38%, var(--border)); color: #fda4af; }
+.status-badge--default { border-color: var(--border); color: var(--text-secondary); }
+
+.orders-pagination {
+  padding-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.orders-pagination__summary {
+  color: var(--text-secondary);
+}
+
+.orders-pagination__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.orders-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@keyframes shimmer {
+  to { background-position-x: -200%; }
+}
+
+@media (max-width: 920px) {
+  .orders-page {
+    width: min(1200px, 100% - 24px);
+    margin: 24px auto 36px;
+  }
+
+  .orders-filters {
+    grid-template-columns: 1fr;
+  }
+}
+
+.orders-details-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1fr);
+}
+
+.orders-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.orders-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.orders-row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.orders-row-between--strong {
+  font-weight: 700;
+}
+
+.orders-id-label {
+  font-weight: 700;
+}
+
+.orders-subline {
+  margin-top: 8px;
+}
+
+.orders-section-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.orders-info-grid {
+  margin-top: 10px;
+  display: grid;
+  gap: 7px;
+}
+
+.orders-products-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.orders-product-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.orders-product-image {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.orders-product-meta {
+  flex: 1;
+}
+
+.orders-field-label {
+  font-size: 0.95rem;
+  display: grid;
+  gap: 8px;
+  color: var(--text-secondary);
+}
+
+.orders-status-select-wrap {
+  margin-top: 10px;
+}
+
+.orders-feedback {
+  margin-top: 10px;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.orders-feedback--success {
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  color: color-mix(in srgb, var(--success) 90%, white);
+  border: 1px solid color-mix(in srgb, var(--success) 35%, var(--border));
+}
+
+.orders-feedback--error {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  color: color-mix(in srgb, var(--danger) 85%, white);
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--border));
+}
+
+.orders-price-grid {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.orders-divider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
+
+.orders-timeline-grid {
+  margin-top: 10px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+}
+
+.orders-timeline-step {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px;
+}
+
+.orders-timeline-step__title {
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.orders-timeline-step__hint {
+  margin-top: 4px;
+  font-size: 0.82rem;
+}
+
+.orders-timeline-step--done {
+  border-color: color-mix(in srgb, var(--success) 35%, var(--border));
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+  color: color-mix(in srgb, var(--success) 88%, white);
+}
+
+.orders-timeline-step--cancelled {
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  color: color-mix(in srgb, var(--danger) 86%, white);
+}
+
+.orders-timeline-step--waiting {
+  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--bg-secondary) 65%, transparent);
+}
+
+@media (max-width: 1080px) {
+  .orders-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .orders-timeline-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .orders-timeline-grid {
+    grid-template-columns: 1fr;
+  }
+}

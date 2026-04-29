@@ -6,6 +6,7 @@ import OrderTimeline from '../../components/orders/OrderTimeline';
 import StatusBadge from '../../components/orders/StatusBadge';
 import { formatDate, formatMoney } from '../../components/orders/orderUtils';
 import { useOrder, useUpdateOrderStatus } from '../../hooks/useOrders';
+import './orders.css';
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -28,90 +29,90 @@ export default function OrderDetailsPage() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-7xl space-y-5 px-4 py-6 text-white sm:px-6">
-      <header className="flex flex-wrap items-center justify-between gap-2">
+    <section className="orders-page">
+      <header className="orders-page__header">
         <div>
-          <h1 className="text-2xl font-bold">Order Details</h1>
-          <p className="text-sm text-white/70">Review customer data, products, and fulfillment status.</p>
+          <h1 className="orders-page__title">Order Details</h1>
+          <p className="orders-page__subtitle">Review customer data, products, and fulfillment status.</p>
         </div>
-        <Link to="/dashboard/orders" className="rounded-md border border-white/10 px-3 py-1.5 text-sm text-white/90">Back to orders</Link>
+        <Link to="/dashboard/orders" className="orders-btn">Back to orders</Link>
       </header>
 
       {isLoading && <OrderDetailsSkeleton />}
 
       {isError && (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-100" role="alert">
+        <div className="orders-error" role="alert">
           <p>{error instanceof Error ? error.message : 'Unable to load this order.'}</p>
-          <button type="button" onClick={() => refetch()} className="mt-2 rounded-md border border-rose-300/40 px-3 py-1.5">Retry</button>
+          <button type="button" onClick={() => refetch()} className="orders-btn">Retry</button>
         </div>
       )}
 
       {!isLoading && !isError && order && (
-        <div className="grid gap-5 lg:grid-cols-3">
-          <div className="space-y-5 lg:col-span-2">
-            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <p className="font-semibold">{order.id}</p>
+        <div className="orders-details-grid">
+          <div className="orders-stack">
+            <article className="orders-card">
+              <div className="orders-row-between">
+                <p className="orders-id-label">{order.id}</p>
                 <StatusBadge status={order.status} />
               </div>
-              <p className="text-sm text-white/70">Created {formatDate(order.createdAt)}</p>
-              <p className="mt-2 text-sm text-white/80">Payment method: {order.paymentMethod}</p>
+              <p className="orders-muted">Created {formatDate(order.createdAt)}</p>
+              <p className="orders-subline">Payment method: {order.paymentMethod}</p>
             </article>
 
-            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <h2 className="text-base font-semibold">Customer Information</h2>
-              <div className="mt-3 grid gap-2 text-sm text-white/80">
-                <p><span className="text-white/60">Name:</span> {order.customer?.name || order.customerName}</p>
-                <p><span className="text-white/60">Email:</span> {order.customer?.email || '-'}</p>
-                <p><span className="text-white/60">Phone:</span> {order.customer?.phone || '-'}</p>
-                <p><span className="text-white/60">Address:</span> {order.customer?.address || '-'}</p>
+            <article className="orders-card">
+              <h2 className="orders-section-title">Customer Information</h2>
+              <div className="orders-info-grid">
+                <p><span className="orders-muted">Name:</span> {order.customer?.name || order.customerName}</p>
+                <p><span className="orders-muted">Email:</span> {order.customer?.email || '-'}</p>
+                <p><span className="orders-muted">Phone:</span> {order.customer?.phone || '-'}</p>
+                <p><span className="orders-muted">Address:</span> {order.customer?.address || '-'}</p>
               </div>
             </article>
 
-            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <h2 className="text-base font-semibold">Products</h2>
-              <div className="mt-3 space-y-3">
+            <article className="orders-card">
+              <h2 className="orders-section-title">Products</h2>
+              <div className="orders-products-list">
                 {(order.products || []).map((product) => (
-                  <div key={product.id} className="flex items-center gap-3 rounded-lg border border-white/10 p-3">
-                    <img src={product.image} alt={product.name} className="h-14 w-14 rounded-md object-cover" />
-                    <div className="flex-1 text-sm">
-                      <p className="font-semibold">{product.name}</p>
-                      <p className="text-white/60">Qty: {product.quantity}</p>
+                  <div key={product.id} className="orders-product-item">
+                    <img src={product.image} alt={product.name} className="orders-product-image" />
+                    <div className="orders-product-meta">
+                      <p className="orders-id-label">{product.name}</p>
+                      <p className="orders-muted">Qty: {product.quantity}</p>
                     </div>
-                    <p className="text-sm font-semibold">{formatMoney(product.price)}</p>
+                    <p className="orders-id-label">{formatMoney(product.price)}</p>
                   </div>
                 ))}
               </div>
             </article>
 
-            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <article className="orders-card">
               <OrderTimeline status={order.status} />
             </article>
           </div>
 
-          <aside className="space-y-5">
-            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <h2 className="text-base font-semibold">Status Management</h2>
-              <div className="mt-3">
+          <aside className="orders-stack">
+            <article className="orders-card">
+              <h2 className="orders-section-title">Status Management</h2>
+              <div className="orders-status-select-wrap">
                 <OrderStatusSelect value={order.status} loading={updateStatus.isPending} onChange={handleStatusChange} />
               </div>
 
               {feedback && (
-                <p className={`mt-3 rounded-md px-3 py-2 text-sm ${feedback.type === 'success' ? 'bg-emerald-500/15 text-emerald-200' : 'bg-rose-500/15 text-rose-200'}`} role="status">
+                <p className={`orders-feedback orders-feedback--${feedback.type}`} role="status">
                   {feedback.message}
                 </p>
               )}
             </article>
 
-            <article className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <h2 className="text-base font-semibold">Price Breakdown</h2>
-              <div className="mt-3 space-y-2 text-sm">
-                <div className="flex items-center justify-between"><span className="text-white/70">Subtotal</span><span>{formatMoney(order.subtotal)}</span></div>
-                <div className="flex items-center justify-between"><span className="text-white/70">Shipping</span><span>{formatMoney(order.shipping)}</span></div>
-                <div className="flex items-center justify-between"><span className="text-white/70">Tax</span><span>{formatMoney(order.tax)}</span></div>
-                <div className="flex items-center justify-between"><span className="text-white/70">Discount</span><span>-{formatMoney(order.discount)}</span></div>
-                <hr className="border-white/10" />
-                <div className="flex items-center justify-between font-semibold"><span>Total</span><span>{formatMoney(order.totalPrice)}</span></div>
+            <article className="orders-card">
+              <h2 className="orders-section-title">Price Breakdown</h2>
+              <div className="orders-price-grid">
+                <div className="orders-row-between"><span className="orders-muted">Subtotal</span><span>{formatMoney(order.subtotal)}</span></div>
+                <div className="orders-row-between"><span className="orders-muted">Shipping</span><span>{formatMoney(order.shipping)}</span></div>
+                <div className="orders-row-between"><span className="orders-muted">Tax</span><span>{formatMoney(order.tax)}</span></div>
+                <div className="orders-row-between"><span className="orders-muted">Discount</span><span>-{formatMoney(order.discount)}</span></div>
+                <hr className="orders-divider" />
+                <div className="orders-row-between orders-row-between--strong"><span>Total</span><span>{formatMoney(order.totalPrice)}</span></div>
               </div>
             </article>
           </aside>

@@ -2,7 +2,7 @@ import { humanizeStatus, statusClasses } from './orderUtils';
 
 export default function StatusBadge({ status }) {
   return (
-    <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClasses[status] || 'border-white/20 text-white/80'}`}>
+    <span className={`status-badge ${statusClasses[status] || 'status-badge--default'}`}>      
       {humanizeStatus(status || 'pending')}
     </span>
   );

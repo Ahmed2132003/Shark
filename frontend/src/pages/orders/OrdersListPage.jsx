@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useOrders } from '../../hooks/useOrders';
 import OrderFilters from '../../components/orders/OrderFilters';
 import OrdersPagination from '../../components/orders/OrdersPagination';
 import OrdersTable from '../../components/orders/OrdersTable';
+import './orders.css';
 
 const DEFAULT_FILTERS = {
   search: '',
@@ -26,27 +28,30 @@ export default function OrdersListPage() {
   } = useOrders(queryFilters);
 
   return (
-    <section className="mx-auto w-full max-w-7xl space-y-5 px-4 py-6 text-white sm:px-6">
-      <header>
-        <h1 className="text-2xl font-bold">Orders Management</h1>
-        <p className="text-sm text-white/70">Search, filter, and monitor all order activity.</p>
+    <section className="orders-page">
+      <header className="orders-page__header">
+        <div>
+          <h1 className="orders-page__title">Orders Management</h1>
+          <p className="orders-page__subtitle">Search, filter, and monitor all order activity.</p>
+        </div>
+        <Link to="/dashboard" className="orders-btn">Back to dashboard</Link>
       </header>
 
-      <OrderFilters filters={filters} onChange={setFilters} />
+      <div className="orders-surface">
+        <OrderFilters filters={filters} onChange={setFilters} />
+      </div>
 
-      {isFetching && !isLoading && (
-        <p className="text-xs text-violet-200">Refreshing orders...</p>
-      )}
+      {isFetching && !isLoading && <p className="orders-refresh">Refreshing orders...</p>}
 
       {isError ? (
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-100" role="alert">
+        <div className="orders-error" role="alert">
           <p>{error instanceof Error ? error.message : 'Unable to load orders.'}</p>
-          <button type="button" onClick={() => refetch()} className="mt-2 rounded-md border border-rose-300/40 px-3 py-1.5">
+          <button type="button" onClick={() => refetch()} className="orders-btn">
             Retry
           </button>
         </div>
       ) : (
-        <>
+        <div className="orders-surface">
           <OrdersTable orders={data?.items || []} loading={isLoading} />
           <OrdersPagination
             page={filters.page}
@@ -54,7 +59,7 @@ export default function OrdersListPage() {
             pageSize={filters.pageSize}
             onPageChange={(nextPage) => setFilters((previous) => ({ ...previous, page: Math.max(1, nextPage) }))}
           />
-        </>
+        </div>
       )}
     </section>
   );

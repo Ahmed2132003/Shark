@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import StatsCard from '../../components/dashboard/StatsCard';
 import ProductTable from '../../components/products/ProductTable';
@@ -143,8 +144,13 @@ export default function Dashboard() {
   return (
     <section className="admin-dashboard-overview">
       <header className="admin-dashboard-overview__header">
-        <h1>Dashboard Overview</h1>
-        <p>Live admin snapshot for sales, orders, customers, and catalog performance.</p>
+        <div>
+          <h1>Dashboard Overview</h1>
+          <p>Live admin snapshot for sales, orders, customers, and catalog performance.</p>
+        </div>
+        <Link to="/dashboard/orders" className="admin-dashboard-overview__orders-link">
+          Go to Orders Management
+        </Link>
       </header>
 
       {isLoading && (

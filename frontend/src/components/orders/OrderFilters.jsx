@@ -9,19 +9,19 @@ const SORT_OPTIONS = [
 
 export default function OrderFilters({ filters, onChange }) {
   return (
-    <div className="grid gap-3 rounded-xl border border-white/10 bg-white/5 p-4 md:grid-cols-3">
+    <div className="orders-filters">      
       <input
         type="search"
         value={filters.search}
         onChange={(event) => onChange({ ...filters, search: event.target.value, page: 1 })}
-        className="h-11 rounded-lg border border-white/10 bg-black/30 px-3 text-sm outline-none transition focus:border-violet-400"
+        className="orders-input"        
         placeholder="Search by Order ID or customer"
       />
 
       <select
         value={filters.status}
         onChange={(event) => onChange({ ...filters, status: event.target.value, page: 1 })}
-        className="h-11 rounded-lg border border-white/10 bg-black/30 px-3 text-sm outline-none transition focus:border-violet-400"
+        className="orders-select"        
       >
         <option value="all">All statuses</option>
         {ORDER_STATUSES.map((status) => (
@@ -32,7 +32,7 @@ export default function OrderFilters({ filters, onChange }) {
       <select
         value={filters.sortBy}
         onChange={(event) => onChange({ ...filters, sortBy: event.target.value, page: 1 })}
-        className="h-11 rounded-lg border border-white/10 bg-black/30 px-3 text-sm outline-none transition focus:border-violet-400"
+        className="orders-select"        
       >
         {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>{option.label}</option>

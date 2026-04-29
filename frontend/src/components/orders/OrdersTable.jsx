@@ -4,9 +4,9 @@ import { formatDate, formatMoney } from './orderUtils';
 
 function OrdersTableSkeleton() {
   return (
-    <div className="space-y-3">
+    <div className="orders-skeleton" aria-hidden="true">      
       {Array.from({ length: 6 }).map((_, index) => (
-        <div key={index} className="h-14 animate-pulse rounded-lg bg-white/5" />
+        <div key={index} className="orders-skeleton-row" />        
       ))}
     </div>
   );
@@ -19,37 +19,37 @@ export default function OrdersTable({ orders, loading }) {
 
   if (!orders.length) {
     return (
-      <div className="rounded-xl border border-dashed border-white/20 bg-white/[0.02] p-8 text-center text-sm text-white/70">
+      <div className="orders-empty">        
         No orders found. Adjust the filters or search term.
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-white/10">
-      <table className="min-w-full text-left text-sm">
-        <thead className="bg-white/[0.03] text-white/70">
+    <div className="orders-table-wrap">
+      <table className="orders-table">
+        <thead>        
           <tr>
-            <th className="px-4 py-3">Order ID</th>
-            <th className="px-4 py-3">Customer Name</th>
-            <th className="px-4 py-3">Total Price</th>
-            <th className="px-4 py-3">Payment Method</th>
-            <th className="px-4 py-3">Status</th>
-            <th className="px-4 py-3">Created At</th>
-            <th className="px-4 py-3">Actions</th>
+            <th>Order ID</th>
+            <th>Customer Name</th>
+            <th>Total Price</th>
+            <th>Payment Method</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>            
           </tr>
         </thead>
         <tbody>
           {orders.map((order) => (
-            <tr key={order.id} className="border-t border-white/10 hover:bg-white/[0.03]">
-              <td className="whitespace-nowrap px-4 py-3 font-semibold">{order.id}</td>
-              <td className="whitespace-nowrap px-4 py-3">{order.customerName}</td>
-              <td className="whitespace-nowrap px-4 py-3">{formatMoney(order.totalPrice)}</td>
-              <td className="whitespace-nowrap px-4 py-3">{order.paymentMethod}</td>
-              <td className="whitespace-nowrap px-4 py-3"><StatusBadge status={order.status} /></td>
-              <td className="whitespace-nowrap px-4 py-3 text-white/70">{formatDate(order.createdAt)}</td>
-              <td className="whitespace-nowrap px-4 py-3">
-                <Link to={`/dashboard/orders/${order.id}`} className="text-violet-300 transition hover:text-violet-200">
+            <tr key={order.id}>
+              <td><strong>{order.id}</strong></td>
+              <td>{order.customerName}</td>
+              <td>{formatMoney(order.totalPrice)}</td>
+              <td>{order.paymentMethod}</td>
+              <td><StatusBadge status={order.status} /></td>
+              <td className="orders-muted">{formatDate(order.createdAt)}</td>
+              <td>
+                <Link to={`/dashboard/orders/${order.id}`} className="orders-link">                
                   View details
                 </Link>
               </td>
