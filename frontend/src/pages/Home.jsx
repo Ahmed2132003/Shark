@@ -222,19 +222,29 @@ function CategoryCard({ cat, index }) {
       }}
     >
       <Link to={`/products?category=${cat.slug}`} style={{ textDecoration: 'none' }}>
-        {cat.image ? (
-          <img src={cat.image} alt={cat.name}
-            style={{ width: '100%', height: '70%', objectFit: 'cover' }} />
-        ) : (
+        <div style={{
+          height: '70%',
+          background: 'linear-gradient(135deg, var(--accent-glow), var(--bg-hover))',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '16px',
+        }}>          
           <div style={{
-            height: '70%',
-            background: 'linear-gradient(135deg, var(--accent-glow), var(--bg-hover))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '48px',
+            fontSize: 'clamp(18px, 2.2vw, 26px)',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontFamily: "'Syne', sans-serif",
+            letterSpacing: '-0.5px',
+            lineHeight: 1,
+            whiteSpace: 'nowrap',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',            
           }}>
-            🏷️
+            🦈 SHARK            
           </div>
-        )}
+        </div>        
         <div style={{ padding: '16px' }}>
           <div style={{
             fontWeight: 700, fontSize: '16px',
