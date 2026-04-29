@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion as Motion, useScroll, useTransform } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,31 @@ const stagger = {
   hidden:  {},
   visible: { transition: { staggerChildren: 0.08 } },
 };
+
+const FALLBACK_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%2318192a'/%3E%3Ctext x='50%25' y='50%25' fill='%239aa0c4' font-size='34' text-anchor='middle' dominant-baseline='middle' font-family='Arial, sans-serif'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+function resolveProductImageUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return FALLBACK_IMAGE;
+
+  const trimmedUrl = rawUrl.trim();
+  if (!trimmedUrl) return FALLBACK_IMAGE;
+  if (/^(https?:)?\/\//i.test(trimmedUrl) || trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('blob:')) {
+    return trimmedUrl;
+  }
+
+  const configuredOrigin = import.meta.env.VITE_API_ORIGIN?.trim();
+  const apiBaseUrl = api?.defaults?.baseURL || '';
+  const absoluteBaseMatch = typeof apiBaseUrl === 'string' ? apiBaseUrl.match(/^https?:\/\/[^/]+/i) : null;
+  const runtimeOrigin = 'http://localhost:8080';
+  const apiOrigin = configuredOrigin || absoluteBaseMatch?.[0] || runtimeOrigin;
+  const mediaBase = import.meta.env.VITE_MEDIA_BASE_URL || `${apiOrigin}/media/`;
+
+  if (trimmedUrl.startsWith('/media/') || trimmedUrl.startsWith('/')) {
+    return `${apiOrigin}${trimmedUrl}`;
+  }
+
+  return `${mediaBase.replace(/\/+$/, '')}/${trimmedUrl.replace(/^\/+/, '')}`;
+}
 
 // ─── Sub Components ────────────────────────────────────────────────────────────
 
@@ -223,14 +248,14 @@ function CategoryCard({ cat, index }) {
     >
       <Link to={`/products?category=${cat.slug}`} style={{ textDecoration: 'none' }}>
         <div style={{
-          height: '70%',
+          height: '50%',
           background: 'linear-gradient(135deg, var(--accent-glow), var(--bg-hover))',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '16px',
         }}>          
           <div style={{
             fontSize: 'clamp(18px, 2.2vw, 26px)',
-            fontWeight: 800,
+            fontWeight: 500,
             background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -276,6 +301,19 @@ function CategoryCard({ cat, index }) {
 
 
 function ProductCard({ product, index, t }) {
+  const [imageError, setImageError] = useState(false);
+  const preferredImage = useMemo(() => {
+    if (Array.isArray(product?.images) && product.images.length > 0) {
+      return product.images.find((img) => img?.is_main)?.image || product.images[0]?.image;
+    }
+    return product?.main_image || product?.image || product?.imageUrl || '';
+  }, [product]);
+
+  const imageSrc = useMemo(() => {
+    if (imageError) return FALLBACK_IMAGE;
+    return resolveProductImageUrl(preferredImage);
+  }, [imageError, preferredImage]);
+
   return (
     <Motion.div
       variants={fadeUp} custom={index}
@@ -295,11 +333,12 @@ function ProductCard({ product, index, t }) {
 
         {/* Image */}
         <div style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/3' }}>
-          {product.main_image ? (
+          {preferredImage ? (            
             <Motion.img
-              src={product.main_image} alt={product.name}
+              src={imageSrc} alt={product.name}              
               whileHover={{ scale: 1.08 }}
               transition={{ duration: 0.5 }}
+              onError={() => setImageError(true)}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
