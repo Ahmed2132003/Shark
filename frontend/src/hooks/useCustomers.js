@@ -21,7 +21,7 @@ function normalizeOrder(order) {
 }
 
 async function fetchCustomers(params) {
-  const response = await api.get('/users/customers/', {
+  const response = await api.get('/auth/customers/', {    
     params: {
       search: params.search || undefined,
       page: params.page,
@@ -39,7 +39,7 @@ async function fetchCustomers(params) {
 }
 
 async function fetchCustomer(customerId) {
-  const response = await api.get(`/users/customers/${customerId}/`);
+  const response = await api.get(`/auth/customers/${customerId}/`);  
   const payload = response.data || {};
   const customer = normalizeCustomer(payload.customer || {});
   const orders = (Array.isArray(payload.orders) ? payload.orders : []).map(normalizeOrder);
