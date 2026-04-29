@@ -38,6 +38,9 @@ export default function OrderFilters({ filters, onChange }) {
           <option key={option.value} value={option.value}>{option.label}</option>
         ))}
       </select>
+
+      <input type="date" value={filters.dateFrom || ""} onChange={(event) => onChange({ ...filters, dateFrom: event.target.value, page: 1 })} className="orders-input" />
+      <input type="date" value={filters.dateTo || ""} onChange={(event) => onChange({ ...filters, dateTo: event.target.value, page: 1 })} className="orders-input" />
     </div>
   );
 }

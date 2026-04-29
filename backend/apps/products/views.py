@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import serializers
 from .models import Category, Product, ProductVariant, ProductImage
 from .serializers import (
     CategorySerializer,
@@ -50,12 +51,30 @@ class ProductDetailView(generics.RetrieveAPIView):
 
 
 class FeaturedProductsView(generics.ListAPIView):
-    """المنتجات المميزة للـ Homepage"""
+    """Top ordered products, fallback to newest real products"""
     serializer_class   = ProductListSerializer
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True, is_featured=True)[:8]
+        from django.db.models import Sum
+        from apps.orders.models import OrderItem
+
+        top_ids = list(
+            OrderItem.objects.filter(order__status__in=['delivered'])
+            .values('variant__product_id')
+            .annotate(total_sold=Sum('quantity'))
+            .order_by('-total_sold')
+            .values_list('variant__product_id', flat=True)[:5]
+        )
+
+        if top_ids:
+            preserved = {pid: idx for idx, pid in enumerate(top_ids)}
+            return sorted(
+                Product.objects.filter(id__in=top_ids, is_active=True).select_related('category').prefetch_related('images'),
+                key=lambda p: preserved.get(p.id, 9999)
+            )
+
+        return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images').order_by('-created_at')[:5]
 
 
 # ─── Admin Views (Dashboard) ───────────────────────────────────────────────────
@@ -97,3 +116,14 @@ class AdminProductViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class AdminCategoryViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrStaff]
+    queryset = Category.objects.all().order_by('-created_at')
+    serializer_class = CategorySerializer
+
+    def perform_create(self, serializer):
+        name = serializer.validated_data.get('name', '').strip()
+        if not name:
+            raise serializers.ValidationError({'name': 'Name is required.'})
+        serializer.save(name=name)

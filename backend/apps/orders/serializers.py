@@ -128,3 +128,35 @@ class UpdateOrderStatusSerializer(serializers.Serializer):
     """للـ Admin — تغيير status الأوردر"""
     status = serializers.ChoiceField(choices=Order.STATUS_CHOICES)
     note   = serializers.CharField(required=False, allow_blank=True)
+
+class AdminOrderItemWriteSerializer(serializers.Serializer):
+    variant_id = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1)
+
+class AdminOrderWriteSerializer(serializers.ModelSerializer):
+    items = AdminOrderItemWriteSerializer(many=True)
+    tax = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default=0)
+    shipping = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default=0)
+    discount = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default=0)
+
+    class Meta:
+        model = Order
+        fields = ['customer', 'shipping_name', 'shipping_phone', 'shipping_address', 'status', 'notes', 'items', 'tax', 'shipping', 'discount']
+
+    def create(self, validated_data):
+        from apps.products.models import ProductVariant
+        items = validated_data.pop('items', [])
+        tax = validated_data.pop('tax', 0)
+        shipping = validated_data.pop('shipping', 0)
+        discount = validated_data.pop('discount', 0)
+        order = Order.objects.create(**validated_data)
+        subtotal = 0
+        for item in items:
+            variant = ProductVariant.objects.get(id=item['variant_id'])
+            qty = item['quantity']
+            price = variant.price
+            OrderItem.objects.create(order=order, variant=variant, product_name=variant.product.name, variant_name=variant.name, price_at_order=price, quantity=qty)
+            subtotal += price * qty
+        order.total = subtotal + tax + shipping - discount
+        order.save(update_fields=['total'])
+        return order

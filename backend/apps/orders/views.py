@@ -1,12 +1,13 @@
 from rest_framework import generics, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Order, OrderStatusHistory
+from .models import Order, OrderStatusHistory, OrderItem
 from .serializers import (
     OrderSerializer,
     OrderListSerializer,
     CreateOrderSerializer,
     UpdateOrderStatusSerializer,
+    AdminOrderWriteSerializer,
 )
 
 
@@ -118,7 +119,7 @@ class CancelOrderView(APIView):
 
 # ─── Admin Views ───────────────────────────────────────────────────────────────
 
-class AdminOrderListView(generics.ListAPIView):
+class AdminOrderListView(generics.ListCreateAPIView):
     """GET — كل الأوردرات للـ Dashboard"""
     serializer_class   = OrderListSerializer
     permission_classes = [IsAdminOrStaff]
@@ -126,12 +127,33 @@ class AdminOrderListView(generics.ListAPIView):
     def get_queryset(self):
         qs = Order.objects.all().select_related('customer')
 
-        # Filter بالـ status لو موجود في الـ query params
-        order_status = self.request.query_params.get('status')
+        order_status = self.request.query_params.get("status")
+        search = self.request.query_params.get("search")
+        date_from = self.request.query_params.get("date_from")
+        date_to = self.request.query_params.get("date_to")
+        sort_by = self.request.query_params.get("sortBy", "dateDesc")
         if order_status:
             qs = qs.filter(status=order_status)
-
+        if search:
+            qs = qs.filter(shipping_name__icontains=search) | qs.filter(id__icontains=search)
+        if date_from:
+            qs = qs.filter(created_at__date__gte=date_from)
+        if date_to:
+            qs = qs.filter(created_at__date__lte=date_to)
+        if sort_by == "priceAsc":
+            qs = qs.order_by("total")
+        elif sort_by == "priceDesc":
+            qs = qs.order_by("-total")
+        elif sort_by == "dateAsc":
+            qs = qs.order_by("created_at")
+        else:
+            qs = qs.order_by("-created_at")
         return qs
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return AdminOrderWriteSerializer
+        return OrderListSerializer
 
 
 class AdminOrderDetailView(generics.RetrieveAPIView):
@@ -179,3 +201,18 @@ class AdminUpdateOrderStatusView(APIView):
         )
 
         return Response(OrderSerializer(order).data)
+
+class AdminOrderManageView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAdminOrStaff]
+    queryset = Order.objects.all().prefetch_related('items', 'status_history')
+
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return AdminOrderWriteSerializer
+        return OrderSerializer
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        instance.items.all().delete()
+        serializer.instance = None
+        serializer.save()

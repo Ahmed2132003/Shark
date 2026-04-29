@@ -4,7 +4,7 @@ from .views import (
     MyOrdersView, OrderDetailView,
     TrackOrderView, CancelOrderView,
     AdminOrderListView, AdminOrderDetailView,
-    AdminUpdateOrderStatusView,
+    AdminUpdateOrderStatusView, AdminOrderManageView,    
 )
 
 urlpatterns = [
@@ -17,6 +17,6 @@ urlpatterns = [
 
     # Admin
     path('admin/',              AdminOrderListView.as_view(),       name='admin-order-list'),
-    path('admin/<int:pk>/',     AdminOrderDetailView.as_view(),     name='admin-order-detail'),
+    path('admin/<int:pk>/',     AdminOrderManageView.as_view(),     name='admin-order-detail'),    
     path('admin/<int:pk>/status/', AdminUpdateOrderStatusView.as_view(), name='admin-order-status'),
 ]

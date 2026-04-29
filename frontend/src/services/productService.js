@@ -76,7 +76,7 @@ async function createDefaultVariantIfMissing(productId, payload, existingVariant
 
 export async function getProductCategories() {
   try {
-    const response = await apiClient.get('/products/');    
+    const response = await apiClient.get('/products/admin/categories/');    
     return ensureArrayPayload(response.data);    
   } catch (error) {
     throw new Error(error?.response?.data?.detail || 'Unable to load categories.');
@@ -150,3 +150,6 @@ export async function uploadProductImage(productId, file) {
     throw new Error(error?.response?.data?.detail || 'Unable to upload image.');
   }
 }
+export async function createCategory(payload){ const r=await apiClient.post('/products/admin/categories/', payload); return r.data; }
+export async function updateCategory(id,payload){ const r=await apiClient.patch(`/products/admin/categories/${id}/`, payload); return r.data; }
+export async function deleteCategory(id){ await apiClient.delete(`/products/admin/categories/${id}/`); return {success:true}; }

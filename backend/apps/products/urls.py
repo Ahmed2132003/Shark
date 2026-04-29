@@ -4,10 +4,12 @@ from .views import (
     CategoryListView,
     ProductListView, ProductDetailView, FeaturedProductsView,
     AdminProductViewSet,
+    AdminCategoryViewSet,
 )
 
 router = DefaultRouter()
 router.register(r'admin/products', AdminProductViewSet, basename='admin-products')
+router.register(r'admin/categories', AdminCategoryViewSet, basename='admin-categories')
 
 urlpatterns = [
     # Public

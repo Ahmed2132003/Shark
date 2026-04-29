@@ -7,8 +7,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Category
-        fields = ['id', 'name', 'slug', 'description', 'image', 'parent', 'subcategories']
-
+        fields = ['id', 'name', 'slug', 'description', 'image', 'parent', 'is_active', 'subcategories', 'created_at']
+        
     def get_subcategories(self, obj):
         subs = obj.subcategories.filter(is_active=True)
         return CategorySerializer(subs, many=True).data
