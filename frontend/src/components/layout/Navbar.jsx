@@ -234,7 +234,7 @@ export default function Navbar() {
                         { to: '/profile', icon: '👤', label: t('nav.profile') },
                         { to: '/orders',  icon: '📦', label: t('nav.orders') },
                         ...(user?.role !== 'customer'
-                          ? [{ to: '/dashboard', icon: '📊', label: t('nav.dashboard') }]
+                          ? [{ to: '/dashboard', icon: '📊', label: t('nav.dashboard') }, { to: '/dashboard/customers', icon: '👥', label: 'Customers' }]                          
                           : []),
                       ].map((item) => (
                         <Link key={item.to} to={item.to} style={{ textDecoration: 'none' }}

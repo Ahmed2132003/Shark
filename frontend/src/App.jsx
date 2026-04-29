@@ -26,6 +26,8 @@ import Dashboard from './pages/admin/Dashboard';
 import OrdersListPage from './pages/orders/OrdersListPage';
 import OrderDetailsPage from './pages/orders/OrderDetailsPage';
 import NewOrderPage from './pages/orders/NewOrderPage';
+import CustomersListPage from './pages/customers/CustomersListPage';
+import CustomerDetailsPage from './pages/customers/CustomerDetailsPage';
 
 export default function App() {
   const { theme } = useThemeStore();
@@ -88,6 +90,8 @@ export default function App() {
               <Route path="/dashboard/orders" element={<OrdersListPage />} />
               <Route path="/dashboard/orders/new" element={<NewOrderPage />} />
               <Route path="/dashboard/orders/:id" element={<OrderDetailsPage />} />
+              <Route path="/dashboard/customers" element={<CustomersListPage />} />
+              <Route path="/dashboard/customers/:id" element={<CustomerDetailsPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
