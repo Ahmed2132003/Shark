@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -116,7 +116,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
               { label: '−', action: () => handleQty(qty - 1), disabled: qty <= 1 },
               { label: '+', action: () => handleQty(qty + 1), disabled: !item.is_available || qty >= item.variant?.stock?.quantity },
             ].map((btn, i) => (
-              <Motion.button              
+                    <Motion.button                                        
                 key={i}
                 whileTap={{ scale: 0.85 }}
                 onClick={btn.action}
@@ -182,7 +182,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
           {Number(item.variant?.price).toLocaleString()} × {qty}
         </div>
 
-        <Motion.button        
+              <Motion.button                 
           whileHover={{ scale: 1.1, color: 'var(--danger)' }}
           whileTap={{ scale: 0.9 }}
           onClick={handleRemove}
@@ -252,7 +252,7 @@ function EmptyCart({ t, isRTL }) {
       </p>
 
       <Link to="/products" style={{ textDecoration: 'none' }}>
-        <Motion.button        
+              <Motion.button                     
           whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(108,99,255,0.3)' }}
           whileTap={{ scale: 0.97 }}
           style={{
@@ -271,10 +271,11 @@ function EmptyCart({ t, isRTL }) {
 }
 
 // ─── Order Summary ─────────────────────────────────────────────────────────────
-function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
-  const total    = cart?.total_price || 0;
-  const shipping = total > 500 ? 0 : 50;
-  const grand    = total + shipping;
+function OrderSummary({ cart, t, isRTL, onCheckout, isLoading, regions, selectedRegionId, onSelectRegion, regionsError }) {
+  const total = Number(cart?.total_price || 0);
+  const selectedRegion = (regions || []).find((r) => String(r.id) === String(selectedRegionId));
+  const shipping = selectedRegion ? Number(selectedRegion.price) : 0;
+  const grand = total + shipping;
 
   return (
     <Motion.div    
@@ -326,7 +327,8 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
           </div>
         ))}
 
-        {/* Free Shipping Progress */}
+        {/* Free Shipping Progress */}\
+        {!selectedRegion && <div style={{fontSize:'12px',color:'var(--danger)'}}>{isRTL ? 'اختر المحافظة لحساب الشحن' : 'Select governorate to calculate shipping.'}</div>}
         {shipping > 0 && (
           <div>
             <div style={{
@@ -371,12 +373,13 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
         </div>
       </div>
 
+      <div style={{ marginBottom: '12px' }}><select className="orders-input" value={selectedRegionId || ''} onChange={(e) => onSelectRegion(e.target.value)}><option value="">{isRTL ? 'اختر المحافظة' : 'Select Governorate'}</option>{(regions || []).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}</select>{regionsError && <div style={{ fontSize: '12px', color: 'var(--danger)' }}>{isRTL ? 'تعذر تحميل المحافظات' : 'Failed to load governorates.'}</div>}</div>
       {/* Checkout Button */}
-      <Motion.button      
+            <Motion.button             
         whileHover={{ scale: 1.03, boxShadow: '0 0 40px rgba(108,99,255,0.4)' }}
         whileTap={{ scale: 0.97 }}
         onClick={onCheckout}
-        disabled={isLoading}
+        disabled={isLoading || !selectedRegion}        
         style={{
           width: '100%',
           background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
@@ -400,7 +403,7 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading }) {
 
       {/* Continue Shopping */}
       <Link to="/products" style={{ textDecoration: 'none' }}>
-        <Motion.button
+              <Motion.button
 
           whileHover={{ scale: 1.02 }}
           style={{
@@ -498,6 +501,9 @@ export default function Cart() {
   });
 
   const handleCheckout = () => navigate('/checkout');
+  const [selectedRegionId, setSelectedRegionId] = useState(() => localStorage.getItem('selected_shipping_region') || '');
+  const { data: regions = [], isError: regionsError } = useQuery({ queryKey: ['shipping-regions'], queryFn: () => api.get('/orders/shipping-regions/').then((r) => r.data) });
+  useEffect(() => { localStorage.setItem('selected_shipping_region', selectedRegionId); }, [selectedRegionId]);
 
   const items = cart?.items || [];
 
@@ -544,7 +550,7 @@ export default function Cart() {
 
           {/* Clear Cart */}
           {items.length > 0 && (
-            <Motion.button            
+                  <Motion.button                                   
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => clearCart.mutate()}
@@ -630,6 +636,10 @@ export default function Cart() {
               isRTL={isRTL}
               onCheckout={handleCheckout}
               isLoading={updateItem.isLoading || removeItem.isLoading}
+              regions={regions}
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={setSelectedRegionId}
+              regionsError={regionsError}
             />
           </div>
         )}

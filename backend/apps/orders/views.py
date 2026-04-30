@@ -1,7 +1,7 @@
 from rest_framework import generics, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Order, OrderStatusHistory, OrderItem
+from .models import Order, OrderStatusHistory, OrderItem, ShippingRegion
 from .serializers import (
     OrderSerializer,
     OrderListSerializer,
@@ -216,3 +216,38 @@ class AdminOrderManageView(generics.RetrieveUpdateDestroyAPIView):
         instance.items.all().delete()
         serializer.instance = None
         serializer.save()
+
+
+class ShippingRegionListCreateView(generics.ListCreateAPIView):
+    queryset = ShippingRegion.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.IsAuthenticated()]
+        return [IsAdminOrStaff()]
+
+    def get_serializer_class(self):
+        from rest_framework import serializers
+
+        class _Serializer(serializers.ModelSerializer):
+            class Meta:
+                model = ShippingRegion
+                fields = ['id', 'name', 'price']
+
+        return _Serializer
+
+
+class ShippingRegionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ShippingRegion.objects.all()
+    permission_classes = [IsAdminOrStaff]
+
+    def get_serializer_class(self):
+        from rest_framework import serializers
+
+        class _Serializer(serializers.ModelSerializer):
+            class Meta:
+                model = ShippingRegion
+                fields = ['id', 'name', 'price']
+
+        return _Serializer

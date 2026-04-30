@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Order, OrderItem, OrderStatusHistory
+from .models import Order, OrderItem, OrderStatusHistory, ShippingRegion
 from apps.cart.models import Cart
 
 
@@ -28,7 +28,7 @@ class OrderSerializer(serializers.ModelSerializer):
         model  = Order
         fields = [
             'id', 'customer', 'status',
-            'shipping_name', 'shipping_phone', 'shipping_address',
+            'shipping_name', 'shipping_phone', 'shipping_address', 'shipping_region', 'shipping_fee',
             'notes', 'total', 'items', 'status_history',
             'created_at', 'updated_at'
         ]
@@ -54,6 +54,7 @@ class CreateOrderSerializer(serializers.Serializer):
     shipping_phone   = serializers.CharField(max_length=20)
     shipping_address = serializers.CharField()
     notes            = serializers.CharField(required=False, allow_blank=True)
+    shipping_region_id = serializers.IntegerField()
 
     def validate(self, attrs):
         request = self.context['request']
@@ -82,7 +83,13 @@ class CreateOrderSerializer(serializers.Serializer):
                 "unavailable_items": unavailable
             })
 
+        try:
+            region = ShippingRegion.objects.get(id=attrs['shipping_region_id'])
+        except ShippingRegion.DoesNotExist:
+            raise serializers.ValidationError({"shipping_region_id": "Invalid shipping region."})
+
         attrs['cart'] = cart
+        attrs['shipping_region'] = region
         return attrs
 
     def create(self, validated_data):
@@ -97,6 +104,8 @@ class CreateOrderSerializer(serializers.Serializer):
             shipping_phone=validated_data['shipping_phone'],
             shipping_address=validated_data['shipping_address'],
             notes=validated_data.get('notes', ''),
+            shipping_region=validated_data['shipping_region'].name,
+            shipping_fee=validated_data['shipping_region'].price,
         )
 
         # نقل الـ Cart items للـ Order + خصم من الـ Stock
@@ -141,7 +150,7 @@ class AdminOrderWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['customer', 'shipping_name', 'shipping_phone', 'shipping_address', 'status', 'notes', 'items', 'tax', 'shipping', 'discount']
+        fields = ['customer', 'shipping_name', 'shipping_phone', 'shipping_address', 'shipping_region', 'shipping_fee', 'status', 'notes', 'items', 'tax', 'shipping', 'discount']
 
     def create(self, validated_data):
         from apps.products.models import ProductVariant

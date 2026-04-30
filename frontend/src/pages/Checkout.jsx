@@ -157,7 +157,10 @@ export default function Checkout() {
 
   const items = cart?.items || [];
   const subtotal = Number(cart?.total_price || 0);
-  const shipping = subtotal > 500 ? 0 : 50;
+  const [selectedRegionId, setSelectedRegionId] = useState(() => localStorage.getItem('selected_shipping_region') || '');
+  const { data: regions = [] } = useQuery({ queryKey: ['shipping-regions'], queryFn: () => api.get('/orders/shipping-regions/').then((res) => res.data) });
+  const selectedRegion = regions.find((r) => String(r.id) === String(selectedRegionId));
+  const shipping = selectedRegion ? Number(selectedRegion.price) : 0;  
   const grandTotal = subtotal + shipping;
 
   const hasUnavailableItems = items.some((item) => !item.is_available);
@@ -191,7 +194,7 @@ export default function Checkout() {
     event.preventDefault();
     setFormError('');
 
-    if (!form.shipping_name.trim() || !form.shipping_phone.trim() || !form.shipping_address.trim()) {
+    if (!form.shipping_name.trim() || !form.shipping_phone.trim() || !form.shipping_address.trim() || !selectedRegionId) {      
       setFormError(
         isRTL
           ? 'الاسم ورقم الهاتف والعنوان مطلوبين قبل تأكيد الطلب.'
@@ -200,7 +203,7 @@ export default function Checkout() {
       return;
     }
 
-    createOrder.mutate(form);
+    createOrder.mutate({ ...form, shipping_region_id: Number(selectedRegionId) });    
   };
 
   if (confirmedOrder) {

@@ -30,6 +30,7 @@ import CustomersListPage from './pages/customers/CustomersListPage';
 import CustomerDetailsPage from './pages/customers/CustomerDetailsPage';
 import InvoicesListPage from './pages/invoices/InvoicesListPage';
 import InvoiceDetailsPage from './pages/invoices/InvoiceDetailsPage';
+import ShippingSettingsPage from './pages/shipping/ShippingSettingsPage';
 
 export default function App() {
   const { theme } = useThemeStore();
@@ -96,6 +97,7 @@ export default function App() {
               <Route path="/dashboard/customers/:id" element={<CustomerDetailsPage />} />
               <Route path="/dashboard/invoices" element={<InvoicesListPage />} />
               <Route path="/dashboard/invoices/:id" element={<InvoiceDetailsPage />} />
+              <Route path="/dashboard/shipping" element={<ShippingSettingsPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
