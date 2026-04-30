@@ -100,11 +100,11 @@ export default function ProductFormModal({
   };
 
   return (
-    <div className="product-modal__overlay" role="presentation" onClick={onClose}>
+    <div className="product-modal__backdrop" role="presentation" onClick={onClose}>      
       <div className="product-modal" role="dialog" aria-modal="true" aria-label={title} onClick={(event) => event.stopPropagation()}>
         <header className="product-modal__header">
           <h3>{title}</h3>
-          <button type="button" onClick={onClose} aria-label="Close modal">×</button>
+          <button className="product-modal__close" type="button" onClick={onClose} aria-label="Close modal">×</button>          
         </header>
 
         <form className="product-modal__form" onSubmit={handleSubmit}>
@@ -177,7 +177,7 @@ export default function ProductFormModal({
           </FormField>
 
           <div className="product-modal__row">
-            <label className="product-modal__field" htmlFor="is-featured">
+            <label className="product-modal__field product-modal__field--toggle" htmlFor="is-featured">              
               <span>Featured</span>
               <input
                 id="is-featured"
@@ -187,7 +187,7 @@ export default function ProductFormModal({
               />
             </label>
 
-            <label className="product-modal__field" htmlFor="is-active">
+            <label className="product-modal__field product-modal__field--toggle" htmlFor="is-active">              
               <span>Active</span>
               <input
                 id="is-active"

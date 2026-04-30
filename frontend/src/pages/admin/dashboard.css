@@ -311,6 +311,122 @@
   gap: 14px;
 }
 
+.product-modal__field {
+  display: grid;
+  gap: 8px;
+}
+
+.product-modal__field > span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.product-modal__field input:not([type='checkbox']):not([type='file']),
+.product-modal__field select,
+.product-modal__field textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  outline: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.product-modal__field input:not([type='checkbox']):not([type='file']),
+.product-modal__field select {
+  height: 44px;
+  padding: 0 12px;
+}
+
+.product-modal__field textarea {
+  min-height: 110px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.product-modal__field input:not([type='checkbox']):not([type='file'])::placeholder,
+.product-modal__field textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.product-modal__field input:not([type='checkbox']):not([type='file']):hover,
+.product-modal__field select:hover,
+.product-modal__field textarea:hover {
+  border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
+}
+
+.product-modal__field input:not([type='checkbox']):not([type='file']):focus,
+.product-modal__field select:focus,
+.product-modal__field textarea:focus {
+  border-color: color-mix(in srgb, var(--accent) 75%, white);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+  transform: translateY(-1px);
+}
+
+.product-modal__field small[role='alert'] {
+  color: var(--danger);
+  font-size: 0.82rem;
+}
+
+.product-modal__hint {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.product-modal__field input[type='file'] {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.product-modal__field input[type='file']::file-selector-button {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 8px 12px;
+  margin-inline-end: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.product-modal__field input[type='file']::file-selector-button:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-secondary));
+}
+
+.product-modal__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.product-modal__field--toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.product-modal__field--toggle > span {
+  order: 2;
+  color: var(--text-primary);
+}
+
+.product-modal__field--toggle input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+.product-modal__form {
+  padding: 18px 20px;
+  display: grid;
+  gap: 14px;
+}
+
 .product-modal__row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
