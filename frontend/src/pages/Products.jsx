@@ -2,8 +2,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import api from '../services/api';
+import { getPreferredCartVariant, useAddToCartMutation } from '../hooks/useCartActions';
 
 const DEFAULT_FILTERS = {
   category: '',
@@ -83,7 +84,8 @@ function ProductCard({ product, index, t, onAddToCart }) {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    if (!product.in_stock) return;
+    e.stopPropagation();
+    if (!product.in_stock || adding) return;    
     setAdding(true);
     await onAddToCart(product);
     setTimeout(() => setAdding(false), 800);
@@ -504,7 +506,6 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
 
 export default function Products() {
   const { t, i18n } = useTranslation();
-  const queryClient = useQueryClient();
   const isRTL = i18n.language === 'ar';
   const [searchParams] = useSearchParams();
   const [filterOpen, setFilterOpen] = useState(false);
@@ -543,18 +544,14 @@ export default function Products() {
     queryFn: () => api.get('/products/').then((r) => r.data),
   });
 
-  const addToCart = useMutation({
-    mutationFn: ({ variantId }) => api.post('/cart/add/', { variant_id: variantId, quantity: 1 }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cart'] });
-    },
-  });
+  const addToCart = useAddToCartMutation();
 
   const handleAddToCart = async (product) => {
-    const firstVariant = product.variants?.[0];
-    if (!firstVariant) return;
+    const variant = getPreferredCartVariant(product);
+    if (!variant?.id) return;
+    
     try {
-      await addToCart.mutateAsync({ variantId: firstVariant.id });      
+      await addToCart.mutateAsync({ variantId: variant.id, quantity: 1 });         
     } catch (error) {
       console.error('Failed to add product to cart from listing:', error);
     }

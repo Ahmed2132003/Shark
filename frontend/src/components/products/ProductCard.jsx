@@ -57,6 +57,7 @@ export default function ProductCard({ product, index, t, onAddToCart }) {
 
   const handleAdd = async (event) => {
     event.preventDefault();
+    event.stopPropagation();
     if (!product.in_stock || adding) return;
     setAdding(true);
     await onAddToCart(product);

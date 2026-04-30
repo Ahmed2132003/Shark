@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import api from '../services/api';
+import { useAddToCartMutation } from '../hooks/useCartActions';
 
 // ─── Animation Variants ────────────────────────────────────────────────────────
 const fadeUp = {
@@ -332,7 +333,6 @@ export default function ProductDetail() {
   const { t, i18n }          = useTranslation();
   const isRTL                 = i18n.language === 'ar';
   const navigate              = useNavigate();
-  const queryClient           = useQueryClient();
 
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity]               = useState(1);
@@ -354,13 +354,8 @@ export default function ProductDetail() {
   });
 
   // Add to Cart Mutation
-  const addToCart = useMutation({
-    mutationFn: () => api.post('/cart/add/', {
-      variant_id: selectedVariant.id,
-      quantity,
-    }),
+  const addToCart = useAddToCartMutation({    
     onSuccess: () => {
-      queryClient.invalidateQueries(['cart']);
       showToast(isRTL ? 'تمت الإضافة للسلة ✓' : 'Added to cart!', 'success');
     },
     onError: (err) => {
@@ -600,7 +595,7 @@ export default function ProductDetail() {
                   boxShadow: '0 0 40px rgba(108,99,255,0.4)'
                 } : {}}
                 whileTap={canAdd ? { scale: 0.97 } : {}}
-                onClick={() => canAdd && addToCart.mutate()}
+                onClick={() => canAdd && addToCart.mutate({ variantId: selectedVariant.id, quantity })}                
                 disabled={!canAdd || addToCart.isLoading}
                 style={{
                   flex: 1, minWidth: '200px',
@@ -635,7 +630,7 @@ export default function ProductDetail() {
                   <Motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
-                    onClick={() => addToCart.mutate()}
+                    onClick={() => addToCart.mutate({ variantId: selectedVariant.id, quantity })}                    
                     style={{
                       width: '100%',
                       background: 'transparent',
