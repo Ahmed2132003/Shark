@@ -5,6 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 
+function normalizeShippingRegions(data) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.results)) return data.results;
+  return [];
+}
+
 // ─── Animation Variants ────────────────────────────────────────────────────────
 const fadeUp = {
   hidden:  { opacity: 0, y: 24 },
@@ -327,7 +333,7 @@ function OrderSummary({ cart, t, isRTL, onCheckout, isLoading, regions, selected
           </div>
         ))}
 
-        {/* Free Shipping Progress */}\
+        {/* Free Shipping Progress */}
         {!selectedRegion && <div style={{fontSize:'12px',color:'var(--danger)'}}>{isRTL ? 'اختر المحافظة لحساب الشحن' : 'Select governorate to calculate shipping.'}</div>}
         {shipping > 0 && (
           <div>
@@ -502,7 +508,11 @@ export default function Cart() {
 
   const handleCheckout = () => navigate('/checkout');
   const [selectedRegionId, setSelectedRegionId] = useState(() => localStorage.getItem('selected_shipping_region') || '');
-  const { data: regions = [], isError: regionsError } = useQuery({ queryKey: ['shipping-regions'], queryFn: () => api.get('/orders/shipping-regions/').then((r) => r.data) });
+  const { data: regionsData, isError: regionsError } = useQuery({
+    queryKey: ['shipping-regions'],
+    queryFn: () => api.get('/orders/shipping-regions/').then((r) => r.data),
+  });
+  const regions = normalizeShippingRegions(regionsData);  
   useEffect(() => { localStorage.setItem('selected_shipping_region', selectedRegionId); }, [selectedRegionId]);
 
   const items = cart?.items || [];
