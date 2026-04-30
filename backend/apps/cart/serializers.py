@@ -1,10 +1,22 @@
 from rest_framework import serializers
 from .models import Cart, CartItem
-from apps.products.serializers import ProductVariantSerializer
+from apps.products.models import ProductVariant
+from apps.products.serializers import ProductListSerializer, StockSerializer
+
+
+
+
+class CartProductVariantSerializer(serializers.ModelSerializer):
+    stock = StockSerializer(read_only=True)
+    product = ProductListSerializer(read_only=True)
+
+    class Meta:
+        model = ProductVariant
+        fields = ['id', 'name', 'sku', 'price', 'is_active', 'stock', 'product']
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    variant  = ProductVariantSerializer(read_only=True)
+    variant  = CartProductVariantSerializer(read_only=True)
     subtotal = serializers.ReadOnlyField()
     is_available = serializers.ReadOnlyField()
 

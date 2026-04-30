@@ -5,6 +5,29 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 
+const FALLBACK_CART_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Crect width='240' height='240' fill='%23202439'/%3E%3Ctext x='50%25' y='50%25' fill='%239aa0c4' font-size='24' text-anchor='middle' dominant-baseline='middle' font-family='Arial, sans-serif'%3E📦%3C/text%3E%3C/svg%3E";
+
+function resolveCartImageUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== 'string') return FALLBACK_CART_IMAGE;
+  const trimmedUrl = rawUrl.trim();
+  if (!trimmedUrl) return FALLBACK_CART_IMAGE;
+
+  if (/^(https?:)?\/\//i.test(trimmedUrl) || trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('blob:')) {
+    return trimmedUrl;
+  }
+
+  const configuredOrigin = import.meta.env.VITE_API_ORIGIN?.trim();
+  const apiBaseUrl = api?.defaults?.baseURL || '';
+  const absoluteBaseMatch = typeof apiBaseUrl === 'string' ? apiBaseUrl.match(/^https?:\/\/[^/]+/i) : null;
+  const runtimeOrigin = 'http://localhost:8080';
+  const apiOrigin = configuredOrigin || absoluteBaseMatch?.[0] || runtimeOrigin;
+  const mediaBase = import.meta.env.VITE_MEDIA_BASE_URL || `${apiOrigin}/media/`;
+
+  if (trimmedUrl.startsWith('/')) return `${apiOrigin}${trimmedUrl}`;
+  return `${mediaBase.replace(/\/+$/, '')}/${trimmedUrl.replace(/^\/+/, '')}`;
+}
+
 function normalizeShippingRegions(data) {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.results)) return data.results;
@@ -24,6 +47,10 @@ const fadeUp = {
 function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
   const [qty, setQty]         = useState(item.quantity);
   const [removing, setRemoving] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const productImage = item.variant?.product?.main_image || item.variant?.product?.image || item.image || '';
+  const imageSrc = imageError ? FALLBACK_CART_IMAGE : resolveCartImageUrl(productImage);
 
   const handleQty = (newQty) => {
     if (newQty < 1) return;
@@ -63,10 +90,11 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
           background: 'var(--bg-hover)',
           flexShrink: 0,
         }}>
-          {item.variant?.product?.main_image ? (
+          {productImage ? (            
             <img
-              src={item.variant.product.main_image}
+              src={imageSrc}              
               alt={item.variant?.product?.name}
+              onError={() => setImageError(true)}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
