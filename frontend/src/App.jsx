@@ -28,6 +28,8 @@ import OrderDetailsPage from './pages/orders/OrderDetailsPage';
 import NewOrderPage from './pages/orders/NewOrderPage';
 import CustomersListPage from './pages/customers/CustomersListPage';
 import CustomerDetailsPage from './pages/customers/CustomerDetailsPage';
+import InvoicesListPage from './pages/invoices/InvoicesListPage';
+import InvoiceDetailsPage from './pages/invoices/InvoiceDetailsPage';
 
 export default function App() {
   const { theme } = useThemeStore();
@@ -92,6 +94,8 @@ export default function App() {
               <Route path="/dashboard/orders/:id" element={<OrderDetailsPage />} />
               <Route path="/dashboard/customers" element={<CustomersListPage />} />
               <Route path="/dashboard/customers/:id" element={<CustomerDetailsPage />} />
+              <Route path="/dashboard/invoices" element={<InvoicesListPage />} />
+              <Route path="/dashboard/invoices/:id" element={<InvoiceDetailsPage />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />
