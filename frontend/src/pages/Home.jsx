@@ -324,7 +324,7 @@ function ProductCard({ product, index, t, onAddToCart }) {
   return (
     <Motion.div
       variants={fadeUp} custom={index}
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -8, borderColor: 'var(--accent)' }}      
       style={{
         background: 'var(--bg-card)',
         border: '1px solid var(--border)',
@@ -333,8 +333,6 @@ function ProductCard({ product, index, t, onAddToCart }) {
         position: 'relative',
         transition: 'border-color 0.3s',
       }}
-      onHoverStart={e => e.currentTarget.style.borderColor = 'var(--accent)'}
-      onHoverEnd={e => e.currentTarget.style.borderColor = 'var(--border)'}
     >
       <Link to={`/products/${product.slug}`} style={{ textDecoration: 'none' }}>
 
