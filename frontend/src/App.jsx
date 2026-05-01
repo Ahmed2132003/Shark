@@ -32,6 +32,7 @@ import CustomerDetailsPage from './pages/customers/CustomerDetailsPage';
 import InvoicesListPage from './pages/invoices/InvoicesListPage';
 import InvoiceDetailsPage from './pages/invoices/InvoiceDetailsPage';
 import ShippingSettingsPage from './pages/shipping/ShippingSettingsPage';
+import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   const { theme } = useThemeStore();
@@ -88,7 +89,9 @@ export default function App() {
             <Route element={<PrivateRoute />}>
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/my-orders" element={<MyOrdersPage />} />
-              <Route path="/orders" element={<MyOrdersPage />} />                  
+              <Route path="/orders" element={<MyOrdersPage />} />   
+              <Route path="/orders" element={<MyOrdersPage />} />
+              <Route path="/profile" element={<ProfilePage />} />               
             </Route>
 
             {/* Admin */}

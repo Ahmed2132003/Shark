@@ -14,4 +14,6 @@ urlpatterns = [
     path('change-password/', ChangePasswordView.as_view(),  name='auth-change-password'),
     path('customers/',       AdminCustomerListView.as_view(),   name='admin-customers'),
     path('customers/<int:pk>/', AdminCustomerDetailView.as_view(), name='admin-customer-detail'),
+    path('profile',         ProfileView.as_view(),         name='auth-profile-no-slash'),
+    path('change-password', ChangePasswordView.as_view(),  name='auth-change-password-no-slash'),
 ]

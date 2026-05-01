@@ -42,6 +42,21 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'role', 'created_at']
 
 
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'username', 'phone', 'address', 'created_at']
+        read_only_fields = ['id', 'email', 'created_at']
+
+    def validate_username(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError('Name is required.')
+        return value
+
+
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True, min_length=8)
