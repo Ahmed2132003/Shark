@@ -31,8 +31,16 @@ async function fetchOrderById(orderId) {
   return normalizeOrder(response.data);
 }
 
+async function fetchMyOrders() {
+  const response = await api.get('/orders/my-orders/');
+  const payload = response.data;
+  const items = Array.isArray(payload?.results) ? payload.results : (Array.isArray(payload) ? payload : []);
+  return items.map(normalizeOrder);
+}
+
 export function useOrders(params) { return useQuery({ queryKey: ['orders', params], queryFn: () => fetchOrders(params), placeholderData: (p) => p }); }
 export function useOrder(orderId) { return useQuery({ queryKey: ['order', orderId], queryFn: () => fetchOrderById(orderId), enabled: Boolean(orderId) }); }
+export function useMyOrders() { return useQuery({ queryKey: ['my-orders'], queryFn: fetchMyOrders }); }
 
 export function useCreateOrder() { const qc = useQueryClient(); return useMutation({ mutationFn: (data) => api.post('/orders/admin/', data), onSuccess: () => qc.invalidateQueries({ queryKey: ['orders'] }) }); }
 export function useDeleteOrder() { const qc = useQueryClient(); return useMutation({ mutationFn: (id) => api.delete(`/orders/admin/${id}/`), onSuccess: () => qc.invalidateQueries({ queryKey: ['orders'] }) }); }

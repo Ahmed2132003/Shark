@@ -17,6 +17,7 @@ from .tracking_controller import TrackOrderView
 urlpatterns = [
     path('', CreateOrderView.as_view(), name='order-create'),
     path('my/', MyOrdersView.as_view(), name='order-my-list'),
+    path('my-orders/', MyOrdersView.as_view(), name='order-my-orders-list'),
     path('my/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
     path('my/<int:pk>/cancel/', CancelOrderView.as_view(), name='order-cancel'),
     path('track/<int:order_id>/', TrackOrderView.as_view(), name='order-track'),

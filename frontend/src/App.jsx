@@ -26,6 +26,7 @@ import Dashboard from './pages/admin/Dashboard';
 import OrdersListPage from './pages/orders/OrdersListPage';
 import OrderDetailsPage from './pages/orders/OrderDetailsPage';
 import NewOrderPage from './pages/orders/NewOrderPage';
+import MyOrdersPage from './pages/orders/MyOrdersPage';
 import CustomersListPage from './pages/customers/CustomersListPage';
 import CustomerDetailsPage from './pages/customers/CustomerDetailsPage';
 import InvoicesListPage from './pages/invoices/InvoicesListPage';
@@ -81,10 +82,13 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/track/:id" element={<OrderTracking />} />
+            <Route path="/track-order/:id" element={<OrderTracking />} />
 
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>
-              <Route path="/checkout" element={<Checkout />} />              
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/my-orders" element={<MyOrdersPage />} />
+              <Route path="/orders" element={<MyOrdersPage />} />                  
             </Route>
 
             {/* Admin */}
