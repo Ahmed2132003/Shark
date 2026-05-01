@@ -157,8 +157,16 @@ export default function Checkout() {
 
   const items = cart?.items || [];
   const subtotal = Number(cart?.total_price || 0);
-  const [selectedRegionId] = useState(() => localStorage.getItem('selected_shipping_region') || '');  
-  const { data: regions = [] } = useQuery({ queryKey: ['shipping-regions'], queryFn: () => api.get('/orders/shipping-regions/').then((res) => res.data) });
+  const [selectedRegionId] = useState(() => localStorage.getItem('selected_shipping_region') || '');
+  const { data: regionsData } = useQuery({
+    queryKey: ['shipping-regions'],
+    queryFn: () => api.get('/orders/shipping-regions/').then((res) => res.data),
+  });
+  const regions = Array.isArray(regionsData)
+    ? regionsData
+    : Array.isArray(regionsData?.results)
+      ? regionsData.results
+      : [];  
   const selectedRegion = regions.find((r) => String(r.id) === String(selectedRegionId));
   const shipping = selectedRegion ? Number(selectedRegion.price) : 0;  
   const grandTotal = subtotal + shipping;
