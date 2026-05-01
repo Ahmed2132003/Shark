@@ -30,6 +30,6 @@ class TrackOrderView(APIView):
                     }
                     for item in order.items.all()
                 ],
-                'tracking_link': f'/track-order/{order.id}',
+                'tracking_link': f'/track/{order.id}',                
             }
         )

@@ -15,7 +15,7 @@ class OrderEmailService:
     @staticmethod
     def _tracking_link(order_id: int) -> str:
         base_url = getattr(settings, 'ORDER_TRACKING_BASE_URL', 'https://yourdomain.com')
-        return f"{base_url.rstrip('/')}/track-order/{order_id}"
+        return f"{base_url.rstrip('/')}/track/{order_id}"    
 
     @classmethod
     def send_order_confirmation(cls, order) -> bool:
