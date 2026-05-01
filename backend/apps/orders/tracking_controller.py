@@ -10,14 +10,15 @@ class TrackOrderView(APIView):
 
     def get(self, request, order_id):
         try:
-            order = Order.objects.prefetch_related('items').get(id=order_id)
+            order = Order.objects.prefetch_related('items', 'status_history').get(id=order_id)            
         except Order.DoesNotExist:
             return Response({'detail': 'Order not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         return Response(
             {
                 'id': order.id,
-                'status': order.get_status_display(),
+                'status': order.status,
+                'status_label': order.get_status_display(),                
                 'shipping_name': order.shipping_name,
                 'shipping_region': order.shipping_region,
                 'total': order.total,
@@ -29,6 +30,15 @@ class TrackOrderView(APIView):
                         'price_at_order': item.price_at_order,
                     }
                     for item in order.items.all()
+                ],
+                'history': [
+                    {
+                        'status': history.new_status,
+                        'status_label': history.get_new_status_display(),
+                        'note': history.note,
+                        'changed_at': history.changed_at,
+                    }
+                    for history in order.status_history.all()
                 ],
                 'tracking_link': f'/track/{order.id}',                
             }
