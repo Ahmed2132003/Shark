@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <body style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.6;">
+    <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+      <div style="background: #111827; color: #fff; padding: 16px 20px;">
+        <h2 style="margin: 0;">Order Confirmation</h2>
+      </div>
+      <div style="padding: 20px;">
+        <p>Hi <strong>{{ order.shipping_name }}</strong>,</p>
+        <p>Thanks for your order. Here are your order details:</p>
+        <ul>
+          <li><strong>Order ID:</strong> #{{ order.id }}</li>
+          <li><strong>Status:</strong> {{ status_label }}</li>
+          <li><strong>Total:</strong> {{ order.total }} EGP</li>
+        </ul>
+        <h4 style="margin-bottom: 8px;">Products</h4>
+        <ul>
+          {% for item in order_items %}
+            <li>{{ item.product_name }} ({{ item.variant_name }}) × {{ item.quantity }}</li>
+          {% endfor %}
+        </ul>
+        <p>
+          Track your order anytime:
+          <a href="{{ tracking_link }}">{{ tracking_link }}</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

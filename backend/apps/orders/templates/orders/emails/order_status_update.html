@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <body style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.6;">
+    <div style="max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+      <div style="background: #0f766e; color: #fff; padding: 16px 20px;">
+        <h2 style="margin: 0;">Order Status Update</h2>
+      </div>
+      <div style="padding: 20px;">
+        <p>Hello <strong>{{ order.shipping_name }}</strong>,</p>
+        <p>Your order status has changed.</p>
+        <ul>
+          <li><strong>Order ID:</strong> #{{ order.id }}</li>
+          <li><strong>New Status:</strong> {{ status_label }}</li>
+        </ul>
+        <p>{{ note }}</p>
+        <p>
+          Track your order:
+          <a href="{{ tracking_link }}">{{ tracking_link }}</a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

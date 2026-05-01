@@ -136,3 +136,12 @@ CORS_ALLOWED_ORIGINS = [
 REDIS_URL = config('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
+# Email (SMTP + App Password)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_HOST_USER = config('EMAIL_USER', default='shark.eg.777@gmail.com')
+EMAIL_HOST_PASSWORD = config('EMAIL_APP_PASSWORD', default='ykve abnj zekc vstu')
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+ORDER_TRACKING_BASE_URL = config('ORDER_TRACKING_BASE_URL', default='https://yourdomain.com')
