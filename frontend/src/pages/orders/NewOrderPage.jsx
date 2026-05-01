@@ -6,6 +6,7 @@ import './orders.css';
 const INITIAL_FORM = {
   shipping_name: '',
   shipping_phone: '',
+  shipping_email: '',
   shipping_address: '',
   variant_id: '',
   quantity: '1',
@@ -30,6 +31,7 @@ export default function NewOrderPage() {
     await createOrder.mutateAsync({
       shipping_name: form.shipping_name.trim(),
       shipping_phone: form.shipping_phone.trim(),
+      shipping_email: form.shipping_email.trim(),
       shipping_address: form.shipping_address.trim(),
       status: 'pending',
       notes: form.notes.trim(),
@@ -57,6 +59,7 @@ export default function NewOrderPage() {
         <div className="orders-form-grid">
           <label className="orders-field"><span>Customer Name</span><input className="orders-input" name="shipping_name" value={form.shipping_name} onChange={handleChange} required /></label>
           <label className="orders-field"><span>Customer Phone</span><input className="orders-input" name="shipping_phone" value={form.shipping_phone} onChange={handleChange} /></label>
+          <label className="orders-field"><span>Customer Email</span><input className="orders-input" name="shipping_email" type="email" value={form.shipping_email} onChange={handleChange} required /></label>
           <label className="orders-field orders-field--full"><span>Shipping Address</span><input className="orders-input" name="shipping_address" value={form.shipping_address} onChange={handleChange} /></label>
           <label className="orders-field"><span>Variant ID</span><input className="orders-input" name="variant_id" type="number" min="1" value={form.variant_id} onChange={handleChange} required /></label>
           <label className="orders-field"><span>Quantity</span><input className="orders-input" name="quantity" type="number" min="1" value={form.quantity} onChange={handleChange} required /></label>

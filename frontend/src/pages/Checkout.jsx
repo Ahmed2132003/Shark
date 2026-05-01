@@ -8,6 +8,7 @@ import api from '../services/api';
 const initialForm = {
   shipping_name: '',
   shipping_phone: '',
+  shipping_email: '',
   shipping_address: '',
   notes: '',
 };
@@ -88,6 +89,10 @@ function OrderConfirmation({ order, isRTL }) {
           {
             label: isRTL ? 'رقم الهاتف' : 'Phone',
             value: order.shipping_phone,
+          },
+          {
+            label: isRTL ? 'البريد الإلكتروني' : 'Email',
+            value: order.shipping_email || '-',
           },
         ].map((line) => (
           <div
@@ -202,11 +207,11 @@ export default function Checkout() {
     event.preventDefault();
     setFormError('');
 
-    if (!form.shipping_name.trim() || !form.shipping_phone.trim() || !form.shipping_address.trim() || !selectedRegionId) {      
+    if (!form.shipping_name.trim() || !form.shipping_phone.trim() || !form.shipping_email.trim() || !form.shipping_address.trim() || !selectedRegionId) {               
       setFormError(
         isRTL
-          ? 'الاسم ورقم الهاتف والعنوان مطلوبين قبل تأكيد الطلب.'
-          : 'Name, phone and address are required before confirming order.'
+          ? 'الاسم ورقم الهاتف والإيميل والعنوان مطلوبين قبل تأكيد الطلب.'
+          : 'Name, phone, email and address are required before confirming order.'          
       );
       return;
     }
@@ -294,12 +299,14 @@ export default function Checkout() {
               {[
                 { key: 'shipping_name', labelAr: 'الاسم بالكامل', labelEn: 'Full name' },
                 { key: 'shipping_phone', labelAr: 'رقم الهاتف', labelEn: 'Phone number' },
+                { key: 'shipping_email', labelAr: 'البريد الإلكتروني', labelEn: 'Email address' },
               ].map((input) => (
                 <label key={input.key} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
                     {isRTL ? input.labelAr : input.labelEn}
                   </span>
                   <input
+                    type={input.key === 'shipping_email' ? 'email' : 'text'}
                     value={form[input.key]}
                     onChange={handleChange(input.key)}
                     style={{
