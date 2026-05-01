@@ -34,7 +34,8 @@ class Order(models.Model):
     # Snapshot من بيانات العميل وقت الطلب
     # (لأن العميل ممكن يغير بياناته بعدين)
     shipping_name    = models.CharField(max_length=200)
-    shipping_phone   = models.CharField(max_length=20)
+    shipping_email   = models.EmailField(max_length=254, blank=True, default='')
+    shipping_phone   = models.CharField(max_length=20)    
     shipping_address = models.TextField()
     shipping_region  = models.CharField(max_length=120, blank=True)
     shipping_fee     = models.DecimalField(max_digits=10, decimal_places=2, default=0)

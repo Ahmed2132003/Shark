@@ -29,7 +29,8 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'customer', 'status',
             'shipping_name', 'shipping_phone', 'shipping_address', 'shipping_region', 'shipping_fee',
-            'notes', 'total', 'items', 'status_history',
+            'shipping_email',
+            'notes', 'total', 'items', 'status_history',            
             'created_at', 'updated_at'
         ]
 
@@ -51,7 +52,8 @@ class CreateOrderSerializer(serializers.Serializer):
     الـ items بتيجي من الـ Cart تلقائياً
     """
     shipping_name    = serializers.CharField(max_length=200)
-    shipping_phone   = serializers.CharField(max_length=20)
+    shipping_email   = serializers.EmailField()
+    shipping_phone   = serializers.CharField(max_length=20)    
     shipping_address = serializers.CharField()
     notes            = serializers.CharField(required=False, allow_blank=True)
     shipping_region_id = serializers.IntegerField()
@@ -101,7 +103,8 @@ class CreateOrderSerializer(serializers.Serializer):
         order = Order.objects.create(
             customer=request.user,
             shipping_name=validated_data['shipping_name'],
-            shipping_phone=validated_data['shipping_phone'],
+            shipping_email=validated_data['shipping_email'],
+            shipping_phone=validated_data['shipping_phone'],            
             shipping_address=validated_data['shipping_address'],
             notes=validated_data.get('notes', ''),
             shipping_region=validated_data['shipping_region'].name,
@@ -150,8 +153,8 @@ class AdminOrderWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['customer', 'shipping_name', 'shipping_phone', 'shipping_address', 'shipping_region', 'shipping_fee', 'status', 'notes', 'items', 'tax', 'shipping', 'discount']
-
+        fields = ['customer', 'shipping_name', 'shipping_email', 'shipping_phone', 'shipping_address', 'shipping_region', 'shipping_fee', 'status', 'notes', 'items', 'tax', 'shipping', 'discount']
+        
     def create(self, validated_data):
         from apps.products.models import ProductVariant
         items = validated_data.pop('items', [])
