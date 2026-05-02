@@ -15,7 +15,10 @@ export default function PrivateRoute({ roles }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (roles && !roles.includes(user?.role)) {
+  const normalizedUserRole = String(user?.role || '').trim().toLowerCase();
+  const allowedRoles = roles?.map((role) => String(role).trim().toLowerCase());
+
+  if (allowedRoles && !allowedRoles.includes(normalizedUserRole)) {
     return <Navigate to="/" replace />;
   }
 
