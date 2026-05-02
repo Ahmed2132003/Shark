@@ -1,14 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import './orders/orders.css';
 
 function ProfileInfo({ profile }) {
-  const joinedDate = useMemo(() => {
-    if (!profile?.created_at) return '—';
-    return new Date(profile.created_at).toLocaleDateString();
-  }, [profile?.created_at]);
+  const joinedDate = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString()
+    : '—';
 
   return (
     <article className="orders-card">
@@ -25,21 +24,22 @@ function ProfileInfo({ profile }) {
 }
 
 function EditProfileForm({ profile, onSaved }) {
-  const [form, setForm] = useState({ username: '', phone: '', address: '' });
+  const [form, setForm] = useState(() => ({
+    username: profile?.username || '',
+    phone: profile?.phone || '',
+    address: profile?.address || '',
+  }));
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    setForm({
-      username: profile?.username || '',
-      phone: profile?.phone || '',
-      address: profile?.address || '',
-    });
-  }, [profile]);
-
   const updateMutation = useMutation({
-    mutationFn: (payload) => api.put('/users/profile/', payload),
+    mutationFn: (payload) => api.put('/auth/profile/', payload),
     onSuccess: (res) => {
       onSaved(res.data);
+      setForm({
+        username: res.data?.username || '',
+        phone: res.data?.phone || '',
+        address: res.data?.address || '',
+      });
       setErrors({ success: 'Profile updated successfully.' });
     },
     onError: (error) => {
@@ -68,6 +68,17 @@ function EditProfileForm({ profile, onSaved }) {
     updateMutation.mutate(form);
   };
 
+  const currentProfile = {
+    username: profile?.username || '',
+    phone: profile?.phone || '',
+    address: profile?.address || '',
+  };
+
+  const isDirty =
+    form.username !== currentProfile.username ||
+    form.phone !== currentProfile.phone ||
+    form.address !== currentProfile.address;
+
   return (
     <form className="orders-card orders-stack" onSubmit={submit}>
       <h2 className="orders-page__title" style={{ fontSize: '1.2rem' }}>Edit Profile</h2>
@@ -85,7 +96,7 @@ function EditProfileForm({ profile, onSaved }) {
         <textarea className="orders-input" style={{ minHeight: 88, paddingTop: 12 }} placeholder="Address" value={form.address} onChange={(e) => setForm((s) => ({ ...s, address: e.target.value }))} />
         {errors.address && <p className="orders-muted">{errors.address}</p>}
       </div>
-      <button type="submit" className="orders-btn orders-btn--primary" disabled={updateMutation.isPending}>
+      <button type="submit" className="orders-btn orders-btn--primary" disabled={updateMutation.isPending || !isDirty}>
         {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
       </button>
     </form>
@@ -96,7 +107,7 @@ export default function ProfilePage() {
   const { setUser } = useAuthStore();
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['profile'],
-    queryFn: async () => (await api.get('/users/profile/')).data,
+    queryFn: async () => (await api.get('/auth/profile/')).data,
   });
 
   return (
