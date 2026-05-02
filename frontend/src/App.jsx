@@ -36,7 +36,7 @@ import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   const { theme } = useThemeStore();
-  const { isAuthenticated, isAuthReady, setUser, clearAuth, setAuthReady } = useAuthStore();
+  const { isAuthReady, setUser, clearAuth, setAuthReady } = useAuthStore();  
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -52,13 +52,12 @@ export default function App() {
         }
       };
 
-      if (isAuthenticated) {
-        markAuthReady();        
-        return;
-      }
 
       if (!getAccessToken()) {
-        markAuthReady();           
+        if (mounted) {
+          clearAuth();
+        }
+        markAuthReady();               
         return;
       }
 
@@ -82,8 +81,12 @@ export default function App() {
     return () => {
       mounted = false;
     };
-  }, [isAuthenticated, isAuthReady, setUser, clearAuth, setAuthReady]);
+  }, [isAuthReady, setUser, clearAuth, setAuthReady]);
 
+  if (!isAuthReady) {
+    return <div aria-busy="true" />;
+  }
+  
   return (
     <BrowserRouter>
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

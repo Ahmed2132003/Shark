@@ -4,7 +4,7 @@ const ACCESS_KEY = 'access_token';
 const REFRESH_KEY = 'refresh_token';
 
 export function getAccessToken() {
-  return localStorage.getItem(ACCESS_KEY) || localStorage.getItem('access');
+  return localStorage.getItem(ACCESS_KEY) || localStorage.getItem('access') || localStorage.getItem('token');  
 }
 
 export function getRefreshToken() {
@@ -28,6 +28,7 @@ export function clearTokens() {
   localStorage.removeItem(REFRESH_KEY);
   localStorage.removeItem('access');
   localStorage.removeItem('refresh');
+  localStorage.removeItem('token');
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';

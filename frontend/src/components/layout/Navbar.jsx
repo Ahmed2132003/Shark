@@ -7,22 +7,24 @@ import { useThemeStore } from '../../store/themeStore';
 import { useAuthStore } from '../../store/authStore';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../services/api';
+import { getAccessToken } from '../../services/api';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useThemeStore();
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, isAuthReady, user, logout } = useAuthStore();  
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
   const [userMenu, setUserMenu]   = useState(false);
   const location = useLocation();
   const isRTL = i18n.language === 'ar';
+  const token = getAccessToken();
 
   // جيب عدد items الـ Cart
   const { data: cart } = useQuery({
     queryKey: ['cart'],
     queryFn:  () => api.get('/cart/').then(r => r.data),
-    enabled:  true,
+    enabled:  isAuthReady && isAuthenticated && Boolean(token),    
   });
 
   useEffect(() => {
@@ -67,8 +69,9 @@ export default function Navbar() {
           display: 'flex', alignItems: 'center',
           justifyContent: 'space-between',
           height: '72px',
+          position: 'relative',
         }}>
-
+          
           {/* Logo */}
           <Link to="/" style={{ textDecoration: 'none' }}>
             <motion.div
