@@ -36,7 +36,7 @@ import ProfilePage from './pages/ProfilePage';
 
 export default function App() {
   const { theme } = useThemeStore();
-  const { isAuthenticated, setUser, clearAuth } = useAuthStore();
+  const { isAuthenticated, isAuthReady, setUser, clearAuth, setAuthReady } = useAuthStore();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -46,7 +46,13 @@ export default function App() {
     let mounted = true;
 
     async function hydrateAuth() {
-      if (isAuthenticated || !getAccessToken()) {
+      if (isAuthenticated) {
+        if (!isAuthReady) setAuthReady();
+        return;
+      }
+
+      if (!getAccessToken()) {
+        if (!isAuthReady) setAuthReady();        
         return;
       }
 
@@ -68,8 +74,8 @@ export default function App() {
     return () => {
       mounted = false;
     };
-  }, [isAuthenticated, setUser, clearAuth]);
-
+  }, [isAuthenticated, isAuthReady, setUser, clearAuth, setAuthReady]);
+  
   return (
     <BrowserRouter>
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

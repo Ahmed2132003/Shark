@@ -3,9 +3,13 @@ import { useAuthStore } from '../../store/authStore';
 import { getAccessToken } from '../../services/api';
 
 export default function PrivateRoute({ roles }) {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, isAuthReady, user } = useAuthStore();
 
   const hasAccessToken = Boolean(getAccessToken());
+
+  if (!isAuthReady) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     if (hasAccessToken) {
