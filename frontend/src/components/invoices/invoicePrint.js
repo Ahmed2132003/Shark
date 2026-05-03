@@ -2,11 +2,14 @@ import { formatDate, formatMoney } from '../orders/orderUtils';
 import companyInfo from '../../config/companyInfo';
 
 function rows(items = []) {
+  if (!Array.isArray(items) || !items.length) {
+    return '<tr><td colspan="4" style="text-align:center;color:#555">No product lines available for this invoice.</td></tr>';}
+
   return items
     .map((item) => {
       const quantity = Number(item.quantity || 0);
       const unitPrice = Number(item.price || 0);
-      const lineTotal = quantity * unitPrice;
+      const lineTotal = Number(item.total || quantity * unitPrice);
       return `<tr><td>${item.productName || '-'}</td><td>${quantity}</td><td>${formatMoney(unitPrice)}</td><td>${formatMoney(lineTotal)}</td></tr>`;
     })
     .join('');

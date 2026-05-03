@@ -72,14 +72,18 @@ export default function InvoiceDetailsPage() {
                 <table className="orders-table">
                   <thead><tr><th>Product Name</th><th>Quantity</th><th>Price</th><th>Total</th></tr></thead>
                   <tbody>
-                    {(invoice.items || []).map((item) => (
+                    {(invoice.items || []).length ? (invoice.items || []).map((item) => (
                       <tr key={item.id}>
                         <td>{item.productName || '-'}</td>
                         <td>{item.quantity || 0}</td>
                         <td>{formatMoney(item.price || 0)}</td>
-                        <td>{formatMoney((item.quantity || 0) * (item.price || 0))}</td>
+                        <td>{formatMoney(item.total || (item.quantity || 0) * (item.price || 0))}</td>
                       </tr>
-                    ))}
+                    )) : (
+                      <tr>
+                        <td colSpan={4} className="orders-muted" style={{ textAlign: 'center' }}>No product lines available for this invoice.</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

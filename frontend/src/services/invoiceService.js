@@ -1,7 +1,13 @@
 import api from './api';
 
 function normalizeInvoice(invoice) {
-  const rawItems = Array.isArray(invoice.items) ? invoice.items : (Array.isArray(invoice.products) ? invoice.products : []);
+  const rawItems = [
+    invoice.items,
+    invoice.products,
+    invoice.itemized_products,
+    invoice.invoice_items,
+    invoice.order_items,
+  ].find((value) => Array.isArray(value)) || [];
   const subtotal = Number(invoice.subtotal ?? rawItems.reduce((sum, item) => sum + Number(item.unit_price || item.price || 0) * Number(item.quantity || 0), 0));
   const tax = Number(invoice.tax || 0);
   const total = Number(invoice.total ?? subtotal + tax);
@@ -20,10 +26,10 @@ function normalizeInvoice(invoice) {
     shipping: Number(invoice.shipping ?? invoice.shipping_cost ?? invoice.delivery_fee ?? 0),
     items: rawItems.map((item, index) => ({
       id: item.id || item.product_id || `${invoice.id}-${index}`,
-      productName: item.product_name || item.name || item.product?.name || 'Product',
+      productName: item.product_name || item.product_title || item.name || item.title || item.variant_name || item.product?.name || 'Product',
       quantity: Number(item.quantity || 0),
       price: Number(item.unit_price || item.price || 0),
-      total: Number(item.subtotal || Number(item.total_price || 0) || Number(item.unit_price || item.price || 0) * Number(item.quantity || 0)),
+      total: Number(item.subtotal || item.line_total || Number(item.total_price || 0) || Number(item.unit_price || item.price || 0) * Number(item.quantity || 0)),
       image: item.product_image || item.image || item.product?.image || null,
     })),
   };
