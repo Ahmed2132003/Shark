@@ -16,7 +16,7 @@ export default function OrdersListPage() {
   const deleteOrder = useDeleteOrder();
   const updateStatus = useUpdateOrderStatus();
 
-  const handleDelete = async (order) => {
+  const handleDelete = async (order) => {    
     if (!window.confirm(`Delete order #${order.id}?`)) return;
     setActiveAction({ type: 'delete', orderId: order.id });
     try {
@@ -26,9 +26,7 @@ export default function OrdersListPage() {
     }
   };
 
-  const handleStatus = async (order) => {
-    const status = window.prompt('Enter status: pending/confirmed/shipped/delivered/cancelled', order.status);
-    if (!status) return;
+  const handleStatus = async (order, status) => {    
     setActiveAction({ type: 'status', orderId: order.id });
     try {
       await updateStatus.mutateAsync({ orderId: order.id, status });
@@ -37,9 +35,8 @@ export default function OrdersListPage() {
     }
   };
 
-  const handleNote = async (order) => {
-    const note = window.prompt('Add admin note');
-    if (!note) return;
+  const handleNote = async (order, note) => {
+    if (!note?.trim()) return;    
     setActiveAction({ type: 'note', orderId: order.id });
     try {
       await updateStatus.mutateAsync({ orderId: order.id, status: order.status, note });

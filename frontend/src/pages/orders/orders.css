@@ -184,6 +184,36 @@
   align-items: center;
 }
 
+.orders-select--table {
+  height: 34px;
+  min-width: 130px;
+  font-size: 0.8rem;
+  padding: 0 8px;
+}
+
+.orders-inline-row td {
+  background: color-mix(in srgb, var(--bg-secondary) 60%, transparent);
+}
+
+.orders-inline-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.orders-textarea {
+  min-height: 72px;
+  resize: vertical;
+  padding: 10px 12px;
+}
+
+.orders-inline-panel__actions,
+.orders-inline-confirm {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .orders-empty,
 .orders-skeleton-row {
   border-radius: 14px;
