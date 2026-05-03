@@ -6,7 +6,36 @@ import OrderTimeline from '../../components/orders/OrderTimeline';
 import StatusBadge from '../../components/orders/StatusBadge';
 import { formatDate, formatMoney } from '../../components/orders/orderUtils';
 import { useOrder, useUpdateOrderStatus } from '../../hooks/useOrders';
+import api from '../../services/api';
 import './orders.css';
+
+const FALLBACK_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%2318192a'/%3E%3Ctext x='50%25' y='50%25' fill='%239aa0c4' font-size='16' text-anchor='middle' dominant-baseline='middle' font-family='Arial, sans-serif'%3ENo Image%3C/text%3E%3C/svg%3E";
+
+function resolveProductImageUrl(product) {
+  if (!product || typeof product !== 'object') return FALLBACK_IMAGE;
+
+  const rawImage = product.image || product.imageUrl || product.thumbnail || product.main_image || '';
+  if (typeof rawImage !== 'string' || !rawImage.trim()) return FALLBACK_IMAGE;
+
+  const trimmedUrl = rawImage.trim();
+  if (/^(https?:)?\/\//i.test(trimmedUrl) || trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('blob:')) {
+    return trimmedUrl;
+  }
+
+  const configuredOrigin = import.meta.env.VITE_API_ORIGIN?.trim();
+  const apiBaseUrl = api?.defaults?.baseURL || '';
+  const absoluteBaseMatch = typeof apiBaseUrl === 'string' ? apiBaseUrl.match(/^https?:\/\/[^/]+/i) : null;
+  const runtimeOrigin = 'http://localhost:8080';
+  const apiOrigin = configuredOrigin || absoluteBaseMatch?.[0] || runtimeOrigin;
+  const mediaBase = import.meta.env.VITE_MEDIA_BASE_URL || `${apiOrigin}/media/`;
+
+  if (trimmedUrl.startsWith('/')) {
+    return `${apiOrigin}${trimmedUrl}`;
+  }
+
+  return `${mediaBase.replace(/\/+$/, '')}/${trimmedUrl.replace(/^\/+/, '')}`;
+}
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
@@ -73,15 +102,26 @@ export default function OrderDetailsPage() {
               <h2 className="orders-section-title">Products</h2>
               <div className="orders-products-list">
                 {(order.products || []).map((product) => (
-                  <div key={product.id} className="orders-product-item">
-                    <img src={product.image} alt={product.name} className="orders-product-image" />
+                  <div key={product?.id || `${product?.name}-${product?.quantity}`} className="orders-product-item">
+                    <img
+                      src={resolveProductImageUrl(product)}
+                      alt={product?.name || 'Product image'}
+                      className="orders-product-image"
+                      loading="lazy"
+                      onError={(event) => {
+                        if (event.currentTarget.src !== FALLBACK_IMAGE) {
+                          event.currentTarget.src = FALLBACK_IMAGE;
+                        }
+                      }}
+                    />
                     <div className="orders-product-meta">
-                      <p className="orders-id-label">{product.name}</p>
-                      <p className="orders-muted">Qty: {product.quantity}</p>
+                      <p className="orders-id-label">{product?.name || 'Unknown product'}</p>
+                      <p className="orders-muted">Qty: {product?.quantity ?? 0}</p>
                     </div>
-                    <p className="orders-id-label">{formatMoney(product.price)}</p>
+                    <p className="orders-id-label">{formatMoney(product?.price ?? 0)}</p>
                   </div>
                 ))}
+                                
               </div>
             </article>
 
