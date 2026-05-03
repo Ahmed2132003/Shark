@@ -35,7 +35,9 @@ class DashboardStatsView(APIView):
         # ─── Revenue ──────────────────────────────────
         revenue_this_month = sum(o.total for o in orders_this_month)
         revenue_last_month = sum(o.total for o in orders_last_month)
-
+        shipping_this_month = sum(o.shipping_fee for o in orders_this_month)
+        shipping_last_month = sum(o.shipping_fee for o in orders_last_month)
+        
         # ─── Customers ────────────────────────────────
         total_customers     = User.objects.filter(role='customer').count()
         new_customers_month = User.objects.filter(
@@ -72,6 +74,10 @@ class DashboardStatsView(APIView):
                 "this_month":  float(revenue_this_month),
                 "last_month":  float(revenue_last_month),
                 "growth":      self._growth(revenue_this_month, revenue_last_month),
+            },
+            "shipping": {
+                "this_month": float(shipping_this_month),
+                "last_month": float(shipping_last_month),
             },
             "customers": {
                 "total":       total_customers,

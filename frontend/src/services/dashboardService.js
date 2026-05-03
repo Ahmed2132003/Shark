@@ -21,8 +21,15 @@ function formatNumber(value = 0) {
 }
 
 function mapDashboardStats(payload) {
-  const revenueThisMonth = payload?.revenue?.this_month ?? 0;
-  const revenueGrowth = payload?.revenue?.growth ?? 0;
+  const revenueThisMonth = Number(payload?.revenue?.this_month ?? 0) || 0;
+  const revenueGrowth = Number(payload?.revenue?.growth ?? 0) || 0;
+  const shippingThisMonth = Number(
+    payload?.shipping?.this_month
+      ?? payload?.shippingPrice
+      ?? payload?.shipping_cost
+      ?? 0,
+  ) || 0;
+  const netRevenueThisMonth = revenueThisMonth - shippingThisMonth;
 
   const ordersThisMonth = payload?.orders?.this_month ?? 0;
   const ordersLastMonth = payload?.orders?.last_month ?? 0;
@@ -41,6 +48,16 @@ function mapDashboardStats(payload) {
         value: formatCurrency(revenueThisMonth),
         change: Number(revenueGrowth),
         trend: revenueGrowth < 0 ? 'down' : 'up',
+      },
+      {
+        key: 'shipping',
+        title: 'Total Shipping',
+        value: formatCurrency(shippingThisMonth),
+      },
+      {
+        key: 'net-revenue',
+        title: 'Net Revenue',
+        value: formatCurrency(netRevenueThisMonth),
       },
       {
         key: 'orders',

@@ -5,6 +5,18 @@ const ICONS = {
       <path d="M8 12h8M12 8v8" />
     </svg>
   ),
+  shipping: (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 7h11v10H3V7Zm11 3h3l4 3v4h-7v-7Z" />
+      <path d="M7.5 17.5a1.5 1.5 0 1 0 0 .01m9 0a1.5 1.5 0 1 0 0 .01" />
+    </svg>
+  ),
+  'net-revenue': (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 18h16M6 15l4-4 3 3 5-6" />
+      <path d="M15 8h3v3" />
+    </svg>
+  ),
   orders: (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M7 4h10l2 4v12H5V8l2-4Z" />
