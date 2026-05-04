@@ -24,7 +24,8 @@ class Invoice(models.Model):
     customer_email   = models.EmailField(blank=True)
 
     subtotal      = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    discount      = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    shipping      = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount      = models.DecimalField(max_digits=10, decimal_places=2, default=0)    
     tax           = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total         = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -48,9 +49,10 @@ class Invoice(models.Model):
             item.price_at_order * item.quantity
             for item in self.order.items.all()
         )
-        self.total = self.subtotal - self.discount + self.tax
-        self.save(update_fields=['subtotal', 'total'])
-
+        self.shipping = self.order.shipping_fee
+        self.total = self.subtotal + self.shipping - self.discount + self.tax
+        self.save(update_fields=['subtotal', 'shipping', 'total'])
+        
     def save(self, *args, **kwargs):
         if not self.invoice_number:
             self.invoice_number = self.generate_invoice_number()

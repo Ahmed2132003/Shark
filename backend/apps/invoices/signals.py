@@ -23,10 +23,11 @@ def create_invoice_on_order(sender, instance, created, **kwargs):
         customer_phone=instance.shipping_phone,
         customer_address=instance.shipping_address,
         customer_email=instance.customer.email if instance.customer else '',
-        subtotal=instance.total,
+        subtotal=instance.total - instance.shipping_fee,
+        shipping=instance.shipping_fee,
         total=instance.total,
     )
-
+    
     # نسخ عناصر الأوردر للفاتورة
     for item in instance.items.all():
         InvoiceItem.objects.create(
