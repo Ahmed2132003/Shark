@@ -9,7 +9,7 @@ function rows(items = []) {
     .map((item) => {
       const quantity = Number(item.quantity || 0);
       const unitPrice = Number(item.price || item.unit_price || 0);
-      const lineTotal = Number(item.total || item.subtotal || quantity * unitPrice);      
+      const lineTotal = Number(item.total || item.subtotal || 0);                
       return `<tr><td>${item.productName || '-'}</td><td>${quantity}</td><td>${formatMoney(unitPrice)}</td><td>${formatMoney(lineTotal)}</td></tr>`;
     })
     .join('');

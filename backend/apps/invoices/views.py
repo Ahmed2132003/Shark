@@ -13,12 +13,13 @@ class AdminInvoiceListView(generics.ListAPIView):
     permission_classes = [IsAdminOrStaff]
 
     def get_queryset(self):
-        return Invoice.objects.select_related('order').prefetch_related('items').all()
-
+        return Invoice.objects.select_related('order').prefetch_related('items', 'order__items').all()
+    
 
 class AdminInvoiceDetailView(generics.RetrieveAPIView):
     serializer_class = InvoiceSerializer
     permission_classes = [IsAdminOrStaff]
 
     def get_queryset(self):
-        return Invoice.objects.select_related('order').prefetch_related('items').all()
+        return Invoice.objects.select_related('order').prefetch_related('items', 'order__items').all()
+    

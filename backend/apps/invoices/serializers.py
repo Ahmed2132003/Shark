@@ -12,13 +12,34 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
 
 class InvoiceSerializer(serializers.ModelSerializer):
     order_id = serializers.IntegerField(source='order.id', read_only=True)
+    subtotal = serializers.SerializerMethodField()
+    shipping = serializers.SerializerMethodField()
+    tax = serializers.SerializerMethodField()
+    total = serializers.SerializerMethodField()
     items = serializers.SerializerMethodField()
 
-    def get_items(self, obj):
-        invoice_items = obj.items.all()
-        if invoice_items.exists():
-            return InvoiceItemSerializer(invoice_items, many=True).data
+    def _order_value_or_invoice_fallback(self, obj, order_field, invoice_field):
+        if obj.order and hasattr(obj.order, order_field):
+            value = getattr(obj.order, order_field)
+            if value is not None:
+                return value
+        return getattr(obj, invoice_field)
 
+    def get_subtotal(self, obj):
+        return self._order_value_or_invoice_fallback(obj, 'subtotal', 'subtotal')
+
+    def get_shipping(self, obj):
+        return self._order_value_or_invoice_fallback(obj, 'shipping_fee', 'shipping')
+
+    def get_tax(self, obj):
+        return self._order_value_or_invoice_fallback(obj, 'tax', 'tax')
+
+    def get_total(self, obj):
+        return self._order_value_or_invoice_fallback(obj, 'total', 'total')
+
+    def get_items(self, obj):
+        if not obj.order:
+            return []
         return [
             {
                 'id': f"order-item-{item.id}",
@@ -30,7 +51,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
             }
             for item in obj.order.items.all()
         ]
-        
+                
     class Meta:
         model = Invoice
         fields = [

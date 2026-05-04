@@ -77,8 +77,7 @@ export default function InvoiceDetailsPage() {
                         <td>{item.productName || '-'}</td>
                         <td>{item.quantity || 0}</td>
                         <td>{formatMoney(item.price || item.unit_price || 0)}</td>
-                        <td>{formatMoney(item.total || item.subtotal || (item.quantity || 0) * (item.price || item.unit_price || 0))}</td>                        
-                      </tr>
+                        <td>{formatMoney(item.total || item.subtotal || 0)}</td>                                              </tr>
                     )) : (
                       <tr>
                         <td colSpan={4} className="orders-muted" style={{ textAlign: 'center' }}>No product lines available for this invoice.</td>
