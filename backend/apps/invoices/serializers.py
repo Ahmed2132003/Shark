@@ -12,8 +12,25 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
 
 class InvoiceSerializer(serializers.ModelSerializer):
     order_id = serializers.IntegerField(source='order.id', read_only=True)
-    items = InvoiceItemSerializer(many=True, read_only=True)
+    items = serializers.SerializerMethodField()
 
+    def get_items(self, obj):
+        invoice_items = obj.items.all()
+        if invoice_items.exists():
+            return InvoiceItemSerializer(invoice_items, many=True).data
+
+        return [
+            {
+                'id': f"order-item-{item.id}",
+                'product_name': item.product_name,
+                'variant_name': item.variant_name,
+                'unit_price': item.price_at_order,
+                'quantity': item.quantity,
+                'subtotal': item.subtotal,
+            }
+            for item in obj.order.items.all()
+        ]
+        
     class Meta:
         model = Invoice
         fields = [

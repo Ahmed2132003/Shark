@@ -46,6 +46,13 @@ def update_invoice_on_item_add(sender, instance, created, **kwargs):
 
     try:
         invoice = instance.order.invoice
+        InvoiceItem.objects.get_or_create(
+            invoice=invoice,
+            product_name=instance.product_name,
+            variant_name=instance.variant_name,
+            unit_price=instance.price_at_order,
+            quantity=instance.quantity,
+        )
         invoice.calculate_totals()
     except Invoice.DoesNotExist:
         pass
