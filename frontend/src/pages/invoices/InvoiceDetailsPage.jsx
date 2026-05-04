@@ -60,9 +60,9 @@ export default function InvoiceDetailsPage() {
               <h2 className="orders-section-title">Customer Information</h2>
               <div className="orders-info-grid">
                 <p><span className="orders-muted">Name:</span> {invoice.customerName}</p>
-                <p><span className="orders-muted">Email:</span> {invoice.customer_email || '-'}</p>
-                <p><span className="orders-muted">Phone:</span> {invoice.customer_phone || '-'}</p>
-                <p><span className="orders-muted">Address:</span> {invoice.customer_address || '-'}</p>
+                <p><span className="orders-muted">Email:</span> {invoice.customerEmail || '-'}</p>
+                <p><span className="orders-muted">Phone:</span> {invoice.customerPhone || '-'}</p>
+                <p><span className="orders-muted">Address:</span> {invoice.customerAddress || '-'}</p>                
               </div>
             </article>
 
@@ -76,8 +76,8 @@ export default function InvoiceDetailsPage() {
                       <tr key={item.id}>
                         <td>{item.productName || '-'}</td>
                         <td>{item.quantity || 0}</td>
-                        <td>{formatMoney(item.price || 0)}</td>
-                        <td>{formatMoney(item.total || (item.quantity || 0) * (item.price || 0))}</td>
+                        <td>{formatMoney(item.price || item.unit_price || 0)}</td>
+                        <td>{formatMoney(item.total || item.subtotal || (item.quantity || 0) * (item.price || item.unit_price || 0))}</td>                        
                       </tr>
                     )) : (
                       <tr>
