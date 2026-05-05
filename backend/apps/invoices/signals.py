@@ -4,6 +4,27 @@ from apps.orders.models import Order, OrderItem
 from .models import Invoice, InvoiceItem
 
 
+ORDER_TO_INVOICE_STATUS = {
+    'pending': 'draft',
+    'confirmed': 'processing',
+    'shipped': 'sent',
+    'delivered': 'paid',
+    'cancelled': 'cancelled',
+}
+
+
+def sync_invoice_status_with_order(order):
+    try:
+        invoice = order.invoice
+    except Invoice.DoesNotExist:
+        return
+
+    mapped_status = ORDER_TO_INVOICE_STATUS.get(order.status, 'draft')
+    if invoice.status != mapped_status:
+        invoice.status = mapped_status
+        invoice.save(update_fields=['status', 'updated_at'])
+
+
 @receiver(post_save, sender=Order)
 def create_invoice_on_order(sender, instance, created, **kwargs):
     """
@@ -26,6 +47,7 @@ def create_invoice_on_order(sender, instance, created, **kwargs):
         subtotal=instance.total - instance.shipping_fee,
         shipping=instance.shipping_fee,
         total=instance.total,
+        status=ORDER_TO_INVOICE_STATUS.get(instance.status, 'draft'),
     )
     
     # نسخ عناصر الأوردر للفاتورة
@@ -57,3 +79,9 @@ def update_invoice_on_item_add(sender, instance, created, **kwargs):
         invoice.calculate_totals()
     except Invoice.DoesNotExist:
         pass
+
+@receiver(post_save, sender=Order)
+def sync_invoice_on_order_status_change(sender, instance, created, **kwargs):
+    if created:
+        return
+    sync_invoice_status_with_order(instance)

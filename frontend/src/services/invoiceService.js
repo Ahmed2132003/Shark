@@ -22,7 +22,7 @@ function normalizeInvoice(invoice) {
     customerPhone: invoice.customer_phone || invoice.customer?.phone || '',
     customerAddress: invoice.customer_address || '',    
     orderId: invoice.order?.id || invoice.order_id || null,
-    status: (invoice.status || 'pending').toLowerCase() === 'void' ? 'cancelled' : (invoice.status || 'pending').toLowerCase() === 'issued' ? 'pending' : (invoice.status || 'pending').toLowerCase(),
+    status: (invoice.status || 'draft').toLowerCase(),    
     issueDate: invoice.issued_at || invoice.created_at,
     subtotal,
     tax,

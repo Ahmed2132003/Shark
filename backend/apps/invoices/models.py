@@ -7,10 +7,11 @@ import uuid
 class Invoice(models.Model):
 
     STATUS_CHOICES = (
-        ('draft',  'Draft'),    # اتعملت تلقائي مع الأوردر — لسه متأكدتش
-        ('issued', 'Issued'),   # اتأكدت ورقمها اتحجز
-        ('paid',   'Paid'),     # اتدفعت (Cash on Delivery)
-        ('void',   'Void'),     # اتلغت
+        ('draft',      'Draft'),
+        ('processing', 'Processing'),
+        ('sent',       'Sent'),
+        ('paid',       'Paid'),
+        ('cancelled',  'Cancelled'),
     )
 
     order          = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='invoice')
