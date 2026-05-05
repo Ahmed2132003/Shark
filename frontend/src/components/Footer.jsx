@@ -1,4 +1,8 @@
+import { useTranslation } from 'react-i18next';
+
 export default function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer
       style={{
@@ -11,8 +15,8 @@ export default function Footer() {
         background: 'var(--bg-secondary)',
       }}
     >
-      <p style={{ margin: 0 }}>The store was created by Creativity Code</p>
-      <p style={{ margin: 0 }}>By Eng. Ahmed Ibrahim</p>
+      <p style={{ margin: 0 }}>{t('footer.line1')}</p>
+      <p style={{ margin: 0 }}>{t('footer.line2')}</p>
     </footer>
   );
 }

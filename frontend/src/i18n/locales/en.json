@@ -75,5 +75,12 @@
     "confirm": "Confirm",
     "back": "Back",
     "egp": "EGP"
+  },
+  "footer": {
+    "line1": "The store was created by Creativity Code",
+    "line2": "By Eng. Ahmed Ibrahim"
+  },
+  "customers": {
+    "title": "Customers"
   }
 }

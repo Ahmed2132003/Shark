@@ -134,7 +134,7 @@ export default function Navbar() {
                 fontWeight: 700,
               }}
             >
-              {isRTL ? 'EN' : 'عر'}
+              {isRTL ? 'EN' : 'ع'}
             </motion.button>
 
             {/* Theme Toggle */}
@@ -237,7 +237,7 @@ export default function Navbar() {
                         { to: '/profile', icon: '👤', label: t('nav.profile') },
                         { to: '/orders',  icon: '📦', label: t('nav.orders') },
                         ...(String(user?.role || '').trim().toLowerCase() !== 'customer'                          
-                          ? [{ to: '/dashboard', icon: '📊', label: t('nav.dashboard') }, { to: '/dashboard/customers', icon: '👥', label: 'Customers' }]                          
+                          ? [{ to: '/dashboard', icon: '📊', label: t('nav.dashboard') }, { to: '/dashboard/customers', icon: '👥', label: t('customers.title') }]                          
                           : []),
                       ].map((item) => (
                         <Link key={item.to} to={item.to} style={{ textDecoration: 'none' }}
@@ -279,77 +279,25 @@ export default function Navbar() {
                   whileTap={{ scale: 0.95 }}
                   style={{
                     background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
-                    border: 'none', borderRadius: '10px',
-                    padding: '8px 20px', color: 'white',
-                    cursor: 'pointer', fontWeight: 700, fontSize: '14px',
+                    border: 'none',
+                    borderRadius: '10px',
+                    padding: '9px 18px',
+                    color: 'white',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    cursor: 'pointer',
                   }}
                 >
                   {t('nav.login')}
                 </motion.button>
               </Link>
             )}
-
-            {/* Mobile Menu Button */}
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="mobile-menu-btn"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border)',
-                borderRadius: '10px',
-                padding: '8px 12px',
-                cursor: 'pointer',
-                fontSize: '18px',
-                display: 'none',
-              }}
-            >
-              {menuOpen ? '✕' : '☰'}
-            </motion.button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              style={{
-                background: 'var(--bg-secondary)',
-                borderTop: '1px solid var(--border)',
-                padding: '16px 5%',
-                overflow: 'hidden',
-              }}
-            >
-              {navLinks.map((link) => (
-                <Link key={link.to} to={link.to}
-                  onClick={() => setMenuOpen(false)}
-                  style={{
-                    display: 'block', padding: '12px 0',
-                    color: 'var(--text-primary)',
-                    textDecoration: 'none', fontWeight: 600,
-                    fontSize: '16px', borderBottom: '1px solid var(--border)',
-                  }}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.nav>
 
       {/* Spacer */}
       <div style={{ height: '72px' }} />
-
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-menu-btn { display: flex !important; }
-        }
-      `}</style>
     </>
   );
 }
