@@ -1,6 +1,15 @@
 from django.core.management.base import BaseCommand
-from apps.invoices.signals import sync_invoice_status_with_order
 from apps.invoices.models import Invoice
+from apps.orders.models import Order
+
+
+ORDER_TO_INVOICE_STATUS = {
+    'pending': 'draft',
+    'processing': 'processing',
+    'shipped': 'sent',
+    'delivered': 'paid',
+    'cancelled': 'cancelled',
+}
 
 
 class Command(BaseCommand):
@@ -8,11 +17,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         updated = 0
-        for invoice in Invoice.objects.select_related('order').all():
-            previous = invoice.status
-            sync_invoice_status_with_order(invoice.order)
-            invoice.refresh_from_db(fields=['status'])
-            if invoice.status != previous:
+
+        for invoice in Invoice.objects.all():
+            order = Order.objects.filter(id=invoice.order_id).only('status').first()
+            if not order:
+                continue
+
+            mapped_status = ORDER_TO_INVOICE_STATUS.get(order.status, 'draft')
+            if invoice.status != mapped_status:
+                invoice.status = mapped_status
+                invoice.save(update_fields=['status', 'updated_at'])
                 updated += 1
 
         self.stdout.write(self.style.SUCCESS(f'Synced invoice statuses. Updated: {updated}'))
