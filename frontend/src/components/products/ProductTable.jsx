@@ -38,6 +38,7 @@ export default function ProductTable({ products, loading, onAddProduct, onEditPr
             <th>Name</th>
             <th>Price</th>
             <th>Stock</th>
+            <th>Type</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -54,6 +55,7 @@ export default function ProductTable({ products, loading, onAddProduct, onEditPr
               <td>{product.name}</td>
               <td>{currencyFormatter.format(product.price)}</td>
               <td>{product.stock}</td>
+              <td>{product.hasVariants ? 'Variants' : 'Simple'}</td>
               <td>
                 <div className="product-table__actions">
                   <button type="button" onClick={() => onEditProduct(product)}>Edit</button>

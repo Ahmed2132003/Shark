@@ -8,7 +8,7 @@ from .models import Category, Product, ProductVariant, ProductImage
 from .serializers import (
     CategorySerializer,
     ProductListSerializer, ProductDetailSerializer, ProductWriteSerializer,
-    ProductVariantWriteSerializer, ProductImageSerializer,
+    ProductVariantWriteSerializer, ProductVariantSerializer, ProductImageSerializer,
 )
 from .filters import ProductFilter
 
@@ -35,7 +35,7 @@ class ProductListView(generics.ListAPIView):
     ordering           = ['-created_at']
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images')
+        return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size')
 
 
 class ProductDetailView(generics.RetrieveAPIView):
@@ -46,7 +46,7 @@ class ProductDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return Product.objects.filter(is_active=True).prefetch_related(
-            'images', 'variants', 'variants__stock'
+            'images', 'variants__stock', 'variants__color', 'variants__size'
         )
 
 
@@ -70,11 +70,11 @@ class FeaturedProductsView(generics.ListAPIView):
         if top_ids:
             preserved = {pid: idx for idx, pid in enumerate(top_ids)}
             return sorted(
-                Product.objects.filter(id__in=top_ids, is_active=True).select_related('category').prefetch_related('images'),
+                Product.objects.filter(id__in=top_ids, is_active=True).select_related('category').prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size'),
                 key=lambda p: preserved.get(p.id, 9999)
             )
 
-        return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images').order_by('-created_at')[:5]
+        return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size').order_by('-created_at')[:5]
 
 
 # ─── Admin Views (Dashboard) ───────────────────────────────────────────────────
@@ -92,7 +92,7 @@ class AdminProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # الـ Admin بيشوف كل المنتجات حتى الـ inactive
-        return Product.objects.all().select_related('category').prefetch_related('images', 'variants')
+        return Product.objects.all().select_related('category').prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size')
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -107,6 +107,79 @@ class AdminProductViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(product=product)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['get', 'post'], parser_classes=[MultiPartParser, FormParser])
+    def images(self, request, pk=None):
+        """List or upload one or more images for a product."""
+        product = self.get_object()
+        if request.method.lower() == 'get':
+            return Response(ProductImageSerializer(product.images.all(), many=True, context={'request': request}).data)
+
+        files = request.FILES.getlist('images') or request.FILES.getlist('image')
+        if not files and request.FILES.get('image'):
+            files = [request.FILES['image']]
+        if not files:
+            serializer = ProductImageSerializer(data=request.data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            serializer.save(product=product)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        created = []
+        base_order = product.images.count()
+        is_primary_requested = request.data.get('is_primary', request.data.get('is_main', 'false')) in ['true', 'True', '1', True, 1]
+        for index, file_obj in enumerate(files):
+            image = ProductImage.objects.create(
+                product=product,
+                image=file_obj,
+                alt_text=request.data.get('alt_text') or file_obj.name,
+                is_primary=is_primary_requested and index == 0,
+                order=request.data.get('order') or base_order + index,
+            )
+            created.append(image)
+        return Response(ProductImageSerializer(created, many=True, context={'request': request}).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['delete', 'patch'], url_path=r'images/(?P<image_id>[^/.]+)')
+    def image_detail(self, request, pk=None, image_id=None):
+        """Update metadata for or delete a specific product image."""
+        product = self.get_object()
+        try:
+            image = product.images.get(id=image_id)
+        except ProductImage.DoesNotExist:
+            return Response({'detail': 'Image not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if request.method.lower() == 'delete':
+            image.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        serializer = ProductImageSerializer(image, data=request.data, partial=True, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get', 'post'])
+    def variants(self, request, pk=None):
+        """List or add product variants."""
+        product = self.get_object()
+        if request.method.lower() == 'get':
+            return Response(ProductVariantSerializer(product.variants.all(), many=True).data)
+        serializer = ProductVariantWriteSerializer(data={**request.data, 'product': product.id})
+        serializer.is_valid(raise_exception=True)
+        variant = serializer.save()
+        return Response(ProductVariantSerializer(variant).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['put', 'patch', 'delete'], url_path=r'variants/(?P<variant_id>[^/.]+)')
+    def variant_detail(self, request, pk=None, variant_id=None):
+        """Edit or delete a specific product variant."""
+        product = self.get_object()
+        try:
+            variant = product.variants.get(id=variant_id)
+        except ProductVariant.DoesNotExist:
+            return Response({'detail': 'Variant not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if request.method.lower() == 'delete':
+            variant.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        serializer = ProductVariantWriteSerializer(variant, data=request.data, partial=request.method.lower() == 'patch')
+        serializer.is_valid(raise_exception=True)
+        variant = serializer.save(product=product)
+        return Response(ProductVariantSerializer(variant).data)
 
     @action(detail=True, methods=['post'])
     def add_variant(self, request, pk=None):

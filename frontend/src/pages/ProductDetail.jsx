@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -149,72 +149,88 @@ function ImageGallery({ images, name }) {
 }
 
 // ─── Variant Selector ──────────────────────────────────────────────────────────
-function VariantSelector({ variants, selected, onSelect }) {  
+function VariantSelector({ variants, selected, onSelect }) {
+  const colors = useMemo(() => {
+    const map = new Map();
+    variants?.forEach((variant) => {
+      if (variant.color?.name && !map.has(variant.color.name)) map.set(variant.color.name, variant.color);
+    });
+    return Array.from(map.values());
+  }, [variants]);
+
+  const sizes = useMemo(() => {
+    const map = new Map();
+    variants?.forEach((variant) => {
+      if (variant.size?.name && !map.has(variant.size.name)) map.set(variant.size.name, variant.size);
+    });
+    return Array.from(map.values());
+  }, [variants]);
+
+  const selectedColor = selected?.color?.name || '';
+  const selectedSize = selected?.size?.name || '';
+
+  const choose = ({ colorName = selectedColor, sizeName = selectedSize }) => {
+    const next = variants.find((variant) => (
+      (!colorName || variant.color?.name === colorName) &&
+      (!sizeName || variant.size?.name === sizeName) &&
+      variant.stock?.is_available
+    )) || variants.find((variant) => (
+      (!colorName || variant.color?.name === colorName) &&
+      (!sizeName || variant.size?.name === sizeName)
+    ));
+    if (next) onSelect(next);
+  };
+  
   return (
     <div style={{ marginBottom: '28px' }}>
       <div style={{
         fontSize: '12px', fontWeight: 700, letterSpacing: '2px',
-        color: 'var(--text-muted)', marginBottom: '14px',
-        textTransform: 'uppercase',
+        color: 'var(--text-muted)', marginBottom: '14px', textTransform: 'uppercase',        
       }}>
-        {selected
-          ? `✦ ${selected.name}`
-          : '✦ SELECT VARIANT'}
+        ✦ {selected ? `${selected.color?.name || ''} ${selected.size?.name || ''}`.trim() : 'SELECT OPTIONS'}          
       </div>
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        {variants?.map(variant => {
-          const isSelected  = selected?.id === variant.id;
-          const isAvailable = variant.stock?.is_available;
+      {colors.length > 0 && (
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '8px' }}>Color</div>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            {colors.map((color) => {
+              const isSelected = selectedColor === color.name;
+              return (
+                <Motion.button key={color.id || color.name} type="button" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => choose({ colorName: color.name })} style={{
+                  width: '42px', height: '42px', borderRadius: '50%',
+                  border: `3px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
+                  background: color.hex_code || 'var(--bg-card)', cursor: 'pointer',
+                }} title={color.name} aria-label={color.name} />
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-          return (
-            <Motion.button
-              key={variant.id}
-              whileHover={{ scale: isAvailable ? 1.05 : 1 }}
-              whileTap={{ scale: isAvailable ? 0.95 : 1 }}
-              onClick={() => isAvailable && onSelect(variant)}
-              style={{
-                padding: '10px 20px',
-                borderRadius: '12px',
-                border: `2px solid ${isSelected
-                  ? 'var(--accent)'
-                  : isAvailable
-                    ? 'var(--border)'
-                    : 'transparent'}`,
-                background: isSelected
-                  ? 'var(--accent-glow)'
-                  : isAvailable
-                    ? 'var(--bg-card)'
-                    : 'var(--bg-hover)',
-                color: isSelected
-                  ? 'var(--accent)'
-                  : isAvailable
-                    ? 'var(--text-primary)'
-                    : 'var(--text-muted)',
-                cursor:   isAvailable ? 'pointer' : 'not-allowed',
-                fontWeight: 600, fontSize: '14px',
-                position: 'relative', overflow: 'hidden',
-                transition: 'all 0.2s',
-              }}
-            >
-              {!isAvailable && (
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.05) 4px, rgba(255,255,255,0.05) 8px)',
-                }} />
-              )}
-              {variant.name}
-              {isAvailable && variant.stock?.quantity <= 5 && (
-                <span style={{
-                  marginInlineStart: '8px', fontSize: '11px',
-                  color: 'var(--warning)', fontWeight: 700,
+      {sizes.length > 0 && (
+        <div>
+          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '8px' }}>Size</div>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            {sizes.map((size) => {
+              const candidate = variants.find((variant) => variant.size?.name === size.name && (!selectedColor || variant.color?.name === selectedColor));
+              const isAvailable = candidate?.stock?.is_available;
+              const isSelected = selectedSize === size.name;
+              return (
+                <Motion.button key={size.id || size.name} type="button" whileHover={{ scale: isAvailable ? 1.05 : 1 }} whileTap={{ scale: isAvailable ? 0.95 : 1 }} onClick={() => choose({ sizeName: size.name })} style={{
+                  padding: '10px 18px', borderRadius: '12px',
+                  border: `2px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
+                  background: isSelected ? 'var(--accent-glow)' : 'var(--bg-card)',
+                  color: isAvailable ? 'var(--text-primary)' : 'var(--text-muted)',
+                  cursor: 'pointer', fontWeight: 700,                  
                 }}>
-                  ({variant.stock.quantity} left)
-                </span>
-              )}
-            </Motion.button>
-          );
-        })}
-      </div>
+                  
+                  {size.name}
+                </Motion.button>
+              );
+            })}
+          </div>
+        </div>
+      )}      
     </div>
   );
 }
@@ -334,7 +350,7 @@ export default function ProductDetail() {
   const isRTL                 = i18n.language === 'ar';
   const navigate              = useNavigate();
 
-  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [selectedVariantOverride, setSelectedVariantOverride] = useState(null);  
   const [quantity, setQuantity]               = useState(1);
   const [toast, setToast]                     = useState(null);
 
@@ -346,11 +362,7 @@ export default function ProductDetail() {
   // Fetch Product
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ['product', slug],
-    queryFn:  () => api.get(`/products/items/${slug}/`).then(r => r.data),
-    onSuccess: (data) => {
-      const firstAvailable = data.variants?.find(v => v.stock?.is_available);
-      if (firstAvailable) setSelectedVariant(firstAvailable);
-    },
+    queryFn:  () => api.get(`/products/items/${slug}/`).then(r => r.data),    
   });
 
   // Add to Cart Mutation
@@ -391,6 +403,10 @@ export default function ProductDetail() {
     </div>
   );
 
+  const selectedVariant = selectedVariantOverride
+    || product?.variants?.find(v => v.stock?.is_available)
+    || product?.variants?.[0]
+    || null;
   const maxQty    = selectedVariant?.stock?.quantity || 1;
   const canAdd    = selectedVariant?.stock?.is_available && quantity > 0;
   const price     = selectedVariant?.price || product?.base_price;
@@ -556,12 +572,12 @@ export default function ProductDetail() {
             )}
 
             {/* Variant Selector */}
-            {product?.variants?.length > 0 && (
+            {product?.has_variants && product?.variants?.length > 0 && (              
               <Motion.div variants={fadeUp} custom={4}>
                 <VariantSelector
                   variants={product.variants}
                   selected={selectedVariant}
-                  onSelect={setSelectedVariant}
+                  onSelect={setSelectedVariantOverride}                  
                   t={t}
                 />
               </Motion.div>

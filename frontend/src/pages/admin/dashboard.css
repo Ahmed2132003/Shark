@@ -595,3 +595,56 @@
   border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
   background: color-mix(in srgb, var(--danger) 10%, var(--bg-card));
 }
+.product-modal__variants {
+  border: 1px solid var(--border, #2a2f45);
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.product-modal__variants h4 {
+  margin: 0;
+}
+
+.product-modal__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.product-modal__chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+.product-modal__chips span {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+}
+
+.product-modal__variant-table {
+  overflow-x: auto;
+}
+
+.product-modal__variant-table table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+.product-modal__variant-table th,
+.product-modal__variant-table td {
+  border-bottom: 1px solid var(--border, #2a2f45);
+  padding: 8px;
+  text-align: start;
+}
+
+.product-modal__variant-table input {
+  width: 100%;
+}

@@ -50,6 +50,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
   const [imageError, setImageError] = useState(false);
 
   const productImage = item.variant?.product?.main_image || item.variant?.product?.image || item.image || '';
+    const variantLabel = [item.variant?.color?.name, item.variant?.size?.name].filter(Boolean).join(' / ') || item.variant?.name;
   const imageSrc = imageError ? FALLBACK_CART_IMAGE : resolveCartImageUrl(productImage);
 
   const handleQty = (newQty) => {
@@ -135,7 +136,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
           fontSize: '13px', color: 'var(--text-muted)',
           marginBottom: '12px',
         }}>
-          {item.variant?.name}
+          {variantLabel}          
         </div>
 
         {/* Quantity Controls */}
