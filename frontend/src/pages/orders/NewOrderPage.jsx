@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useCreateOrder } from '../../hooks/useOrders';
 import './orders.css';
 
@@ -18,10 +17,6 @@ const INITIAL_FORM = {
 };
 
 export default function NewOrderPage() {
-  const { i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
-  const tr = (en, ar) => (isRTL ? ar : en);
-
   const navigate = useNavigate();
   const createOrder = useCreateOrder();
   const [form, setForm] = useState(INITIAL_FORM);
