@@ -104,6 +104,10 @@ function EditProfileForm({ profile, onSaved }) {
 }
 
 export default function ProfilePage() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const tr = (en, ar) => (isRTL ? ar : en);
+
   const { setUser } = useAuthStore();
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['profile'],
@@ -114,13 +118,13 @@ export default function ProfilePage() {
     <section className="orders-page">
       <header className="orders-page__header">
         <div>
-          <h1 className="orders-page__title">My Profile</h1>
+          <h1 className="orders-page__title">{tr('My Profile', 'ملفي الشخصي')}</h1>
           <p className="orders-page__subtitle">Manage your personal account information.</p>
         </div>
       </header>
 
       {isLoading && <div className="orders-skeleton"><div className="orders-skeleton-row" /><div className="orders-skeleton-row" /></div>}
-      {isError && <div className="orders-error"><p>{error instanceof Error ? error.message : 'Failed to load profile.'}</p><button className="orders-btn" onClick={() => refetch()}>Retry</button></div>}
+      {isError && <div className="orders-error"><p>{error instanceof Error ? error.message : 'Failed to load profile.'}</p><button className="orders-btn" onClick={() => refetch()}>{tr('Retry', 'إعادة المحاولة')}</button></div>}
 
       {!isLoading && !isError && (
         <div className="orders-details-grid">

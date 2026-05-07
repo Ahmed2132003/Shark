@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createShippingRegion,
@@ -22,6 +23,10 @@ function normalizeShippingRegions(data) {
 }
 
 export default function ShippingSettingsPage() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const tr = (en, ar) => (isRTL ? ar : en);
+
   const qc = useQueryClient();
   const [form, setForm] = useState({ name: '', price: '' });
   const [editing, setEditing] = useState(null);
@@ -58,7 +63,7 @@ export default function ShippingSettingsPage() {
     <section className="orders-page">
       <header className="orders-page__header">
         <div>
-          <h1 className="orders-page__title">Shipping Management</h1>
+          <h1 className="orders-page__title">{tr('Shipping Management', 'إدارة الشحن')}</h1>
           <p className="orders-page__subtitle">Configure shipping governorates and prices.</p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>

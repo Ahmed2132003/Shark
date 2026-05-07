@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import InvoiceStatusBadge from '../../components/invoices/InvoiceStatusBadge';
 import { useInvoice } from '../../hooks/useInvoices';
 import { formatDate, formatMoney } from '../../components/orders/orderUtils';
@@ -7,6 +8,10 @@ import companyInfo from '../../config/companyInfo';
 import '../orders/orders.css';
 
 export default function InvoiceDetailsPage() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const tr = (en, ar) => (isRTL ? ar : en);
+
   const { id } = useParams();
   const { data: invoice, isLoading, isError, error, refetch } = useInvoice(id);
 
@@ -14,7 +19,7 @@ export default function InvoiceDetailsPage() {
     <section className="orders-page invoice-page">
       <header className="orders-page__header invoice-page__controls no-print">
         <div>
-          <h1 className="orders-page__title">Invoice Details</h1>
+          <h1 className="orders-page__title">{tr('Invoice Details', 'تفاصيل الفاتورة')}</h1>
           <p className="orders-page__subtitle">Review invoice details and customer billing data.</p>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -29,7 +34,7 @@ export default function InvoiceDetailsPage() {
       </header>
 
       {isLoading && <div className="orders-skeleton" aria-hidden="true">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="orders-skeleton-row" />)}</div>}
-      {isError && <div className="orders-error" role="alert"><p>{error instanceof Error ? error.message : 'Unable to load this invoice.'}</p><button type="button" onClick={() => refetch()} className="orders-btn">Retry</button></div>}
+      {isError && <div className="orders-error" role="alert"><p>{error instanceof Error ? error.message : 'Unable to load this invoice.'}</p><button type="button" onClick={() => refetch()} className="orders-btn">{tr('Retry', 'إعادة المحاولة')}</button></div>}
 
       {!isLoading && !isError && invoice && (
         <div className="orders-details-grid invoice-print-area">

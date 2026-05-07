@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useMyOrders } from '../../hooks/useOrders';
 import OrderCard from '../../components/orders/OrderCard';
 import './orders.css';
 
 export default function MyOrdersPage() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const tr = (en, ar) => (isRTL ? ar : en);
+
   const { data: orders = [], isLoading, isError, error, refetch } = useMyOrders();
 
   return (
@@ -26,7 +31,7 @@ export default function MyOrdersPage() {
       {isError && (
         <div className="orders-error" role="alert">
           <p>{error instanceof Error ? error.message : 'Unable to load your orders right now.'}</p>
-          <button type="button" onClick={() => refetch()} className="orders-btn">Retry</button>
+          <button type="button" onClick={() => refetch()} className="orders-btn">{tr('Retry', 'إعادة المحاولة')}</button>
         </div>
       )}
 

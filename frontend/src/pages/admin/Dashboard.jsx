@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/authStore';
 import StatsCard from '../../components/dashboard/StatsCard';
@@ -14,6 +15,10 @@ function StatsCardSkeleton() {
 }
 
 export default function Dashboard() {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const tr = (en, ar) => (isRTL ? ar : en);
+
   const { isAuthReady, isAuthenticated, user } = useAuthStore();
   const isAdmin = String(user?.role || '').trim().toLowerCase() === 'admin';
   const canFetchDashboardData = isAuthReady && isAuthenticated && isAdmin;
@@ -77,7 +82,7 @@ export default function Dashboard() {
 
   return (<section className="admin-dashboard-overview"><header className="admin-dashboard-overview__header"><div><h1>Dashboard Overview</h1><p>Live admin snapshot for sales, orders, customers, and catalog performance.</p></div><div style={{ display: 'flex', gap: 8 }}><Link to="/dashboard/orders" className="admin-dashboard-overview__orders-link">Go to Orders Management</Link><Link to="/dashboard/customers" className="admin-dashboard-overview__orders-link">Go to Customers Management</Link><Link to="/dashboard/invoices" className="admin-dashboard-overview__orders-link">Go to Invoices Management</Link><Link to="/dashboard/shipping" className="admin-dashboard-overview__orders-link">Go to Shipping Management</Link></div></header>
     {isLoading && <div className="stats-grid">{Array.from({ length: 4 }).map((_, index) => <StatsCardSkeleton key={index} />)}</div>}
-    {!isLoading && isError && <div className="dashboard-error" role="alert"><p>{error instanceof Error ? error.message : 'Something went wrong.'}</p><button type="button" onClick={() => refetch()}>Retry</button></div>}
+    {!isLoading && isError && <div className="dashboard-error" role="alert"><p>{error instanceof Error ? error.message : 'Something went wrong.'}</p><button type="button" onClick={() => refetch()}>{tr('Retry', 'إعادة المحاولة')}</button></div>}
     {!isLoading && !isError && overview && <div className="stats-grid">{overview.stats.map((stat) => <StatsCard key={stat.key} title={stat.title} value={stat.value} change={stat.change} trend={stat.trend} icon={stat.key} />)}</div>}
 
     <section className="products-management"><header className="products-management__header"><div><h2>Categories Management</h2><p>Create/edit categories used by product form.</p></div><div style={{ display: 'flex', gap: 8 }}><input value={categoryName} onChange={(e) => setCategoryName(e.target.value)} placeholder="Category name" className="orders-input" /><button type="button" onClick={handleAddCategory}>Add Category</button></div></header><div className="orders-surface">{(categories || []).map((cat) => <div key={cat.id} className="categories-management__row"><span>{cat.name}</span><div className="categories-management__actions"><button type="button" className="categories-management__action" onClick={() => openEditCategory(cat)}>Edit</button><button type="button" className="categories-management__action categories-management__action--danger" onClick={() => openDeleteCategory(cat)}>Delete</button></div></div>)}
