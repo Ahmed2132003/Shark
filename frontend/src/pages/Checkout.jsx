@@ -75,22 +75,27 @@ function OrderConfirmation({ order, isRTL }) {
       >
         {[
           {
+            key: 'status',
             label: isRTL ? 'الحالة' : 'Status',
             value: order.status,
           },
           {
+            key: 'total',
             label: isRTL ? 'الإجمالي' : 'Total',
             value: `${Number(order.total).toLocaleString()} EGP`,
           },
           {
+            key: 'shipping_name',
             label: isRTL ? 'الاسم' : 'Shipping Name',
             value: order.shipping_name,
           },
           {
+            key: 'phone',
             label: isRTL ? 'رقم الهاتف' : 'Phone',
             value: order.shipping_phone,
           },
           {
+            key: 'email',
             label: isRTL ? 'البريد الإلكتروني' : 'Email',
             value: order.shipping_email || '-',
           },
@@ -105,7 +110,20 @@ function OrderConfirmation({ order, isRTL }) {
             }}
           >
             <div style={{ color: 'var(--text-muted)', fontSize: '12px', marginBottom: '6px' }}>{line.label}</div>
-            <div style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{line.value}</div>
+            <div
+              style={{
+                color: 'var(--text-primary)',
+                fontWeight: 700,
+                ...(line.key === 'email'
+                  ? {
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-all',
+                    }
+                  : {}),
+              }}
+            >
+              {line.value}
+            </div>            
           </div>
         ))}
       </div>
@@ -403,7 +421,7 @@ export default function Checkout() {
                   {isRTL ? 'تعذر تحميل المحافظات.' : 'Failed to load governorates.'}
                 </div>
               )}
-              
+
               {formError && (
                 <div
                   style={{
