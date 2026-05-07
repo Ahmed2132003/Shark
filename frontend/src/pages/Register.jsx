@@ -201,7 +201,22 @@ function InputField({ label, type = 'text', value, onChange, placeholder, error,
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function Register() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
+  
+  const t = (key) => {
+    const messages = {
+      'auth.register_title': isRTL ? 'إنشاء حساب جديد' : 'Create your account',
+      'auth.email': isRTL ? 'البريد الإلكتروني' : 'Email',
+      'auth.username': isRTL ? 'اسم المستخدم' : 'Username',
+      'auth.phone': isRTL ? 'رقم الهاتف' : 'Phone',
+      'auth.password': isRTL ? 'كلمة المرور' : 'Password',
+      'auth.confirm_password': isRTL ? 'تأكيد كلمة المرور' : 'Confirm password',
+      'auth.register_btn': isRTL ? 'تسجيل' : 'Register',
+      'auth.have_account': isRTL ? 'لديك حساب بالفعل؟' : 'Already have an account?',
+      'auth.login_btn': isRTL ? 'تسجيل الدخول' : 'Login',
+    };
+    return messages[key] ?? key;
+  };
   const isRTL       = i18n.language === 'ar';
   const navigate    = useNavigate();
   const { setUser } = useAuthStore();

@@ -505,7 +505,23 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
 }
 
 export default function Products() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
+  
+    const t = (key) => {
+    const messages = {
+      'products.out_of_stock': isRTL ? 'نفد المخزون' : 'Out of stock',
+      'common.egp': isRTL ? 'ج.م' : 'EGP',
+      'products.filter': isRTL ? 'الفلاتر' : 'Filters',
+      'home.categories': isRTL ? 'التصنيفات' : 'Categories',
+      'products.price': isRTL ? 'السعر' : 'Price',
+      'products.in_stock': isRTL ? 'المتوفر فقط' : 'In stock only',
+      'nav.products': isRTL ? 'المنتجات' : 'Products',
+      'products.title': isRTL ? 'كل المنتجات' : 'All Products',
+      'products.search': isRTL ? 'ابحث عن منتجات...' : 'Search products...',
+      'products.no_products': isRTL ? 'لا توجد منتجات' : 'No products found',
+    };
+    return messages[key] ?? key;
+  };
   const isRTL = i18n.language === 'ar';
   const [searchParams] = useSearchParams();
   const [filterOpen, setFilterOpen] = useState(false);

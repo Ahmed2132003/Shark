@@ -132,7 +132,19 @@ function InputField({ label, type = 'text', value, onChange, placeholder, error,
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function Login() {
-  const { t, i18n }   = useTranslation();
+  const { i18n }   = useTranslation();
+  
+    const t = (key) => {
+    const messages = {
+      'auth.login_title': isRTL ? 'مرحبًا بعودتك' : 'Welcome back',
+      'auth.email': isRTL ? 'البريد الإلكتروني' : 'Email',
+      'auth.password': isRTL ? 'كلمة المرور' : 'Password',
+      'auth.login_btn': isRTL ? 'تسجيل الدخول' : 'Login',
+      'auth.no_account': isRTL ? 'ليس لديك حساب؟' : 'Do not have an account?',
+      'auth.register_btn': isRTL ? 'إنشاء حساب' : 'Create account',
+    };
+    return messages[key] ?? key;
+  };
   const isRTL         = i18n.language === 'ar';
   const navigate      = useNavigate();
   const location      = useLocation();

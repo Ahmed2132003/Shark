@@ -505,11 +505,24 @@ function CartSkeleton() {
 
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function Cart() {
-  const { t, i18n }  = useTranslation();
+  const { i18n }  = useTranslation();  
   const isRTL        = i18n.language === 'ar';
   const navigate     = useNavigate();
   const queryClient  = useQueryClient();
-
+  const t = (key) => {
+    const messages = {
+      'products.out_of_stock': isRTL ? 'نفد المخزون' : 'Out of stock',
+      'common.egp': isRTL ? 'ج.م' : 'EGP',
+      'cart.remove': isRTL ? 'حذف' : 'Remove',
+      'cart.empty': isRTL ? 'سلتك فارغة' : 'Your cart is empty',
+      'cart.continue': isRTL ? 'متابعة التسوق' : 'Continue shopping',
+      'cart.total': isRTL ? 'الإجمالي' : 'Total',
+      'cart.checkout': isRTL ? 'إتمام الطلب' : 'Checkout',
+      'nav.cart': isRTL ? 'السلة' : 'Cart',
+      'cart.title': isRTL ? 'سلة التسوق' : 'Shopping Cart',
+    };
+    return messages[key] ?? key;
+  };
   // Fetch Cart
   const { data: cart, isLoading } = useQuery({
     queryKey: ['cart'],

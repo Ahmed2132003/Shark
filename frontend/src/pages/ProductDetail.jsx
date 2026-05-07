@@ -346,7 +346,21 @@ function ProductDetailSkeleton() {
 // ─── Main Component ────────────────────────────────────────────────────────────
 export default function ProductDetail() {
   const { slug }              = useParams();
-  const { t, i18n }          = useTranslation();
+  const { i18n }          = useTranslation();
+  
+    const t = (key) => {
+    const messages = {
+      'common.error': isRTL ? 'خطأ' : 'Error',
+      'common.back': isRTL ? 'رجوع' : 'Back',
+      'nav.home': isRTL ? 'الرئيسية' : 'Home',
+      'nav.products': isRTL ? 'المنتجات' : 'Products',
+      'products.out_of_stock': isRTL ? 'نفد المخزون' : 'Out of stock',
+      'common.egp': isRTL ? 'ج.م' : 'EGP',
+      'cart.quantity': isRTL ? 'الكمية' : 'Quantity',
+      'products.add_to_cart': isRTL ? 'أضف للسلة' : 'Add to cart',
+    };
+    return messages[key] ?? key;
+  };
   const isRTL                 = i18n.language === 'ar';
   const navigate              = useNavigate();
 

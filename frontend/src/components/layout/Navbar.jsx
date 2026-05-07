@@ -10,7 +10,7 @@ import api from '../../services/api';
 import { getAccessToken } from '../../services/api';
 
 export default function Navbar() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { theme, toggleTheme } = useThemeStore();
   const { isAuthenticated, isAuthReady, user, logout } = useAuthStore();  
   const [scrolled, setScrolled]   = useState(false);
@@ -18,6 +18,20 @@ export default function Navbar() {
   const [userMenu, setUserMenu]   = useState(false);
   const location = useLocation();
   const isRTL = i18n.language === 'ar';
+
+  const t = (key) => {
+    const messages = {
+      'nav.home': isRTL ? 'الرئيسية' : 'Home',
+      'nav.products': isRTL ? 'المنتجات' : 'Products',
+      'nav.profile': isRTL ? 'الملف الشخصي' : 'Profile',
+      'nav.orders': isRTL ? 'طلباتي' : 'Orders',
+      'nav.dashboard': isRTL ? 'لوحة التحكم' : 'Dashboard',
+      'customers.title': isRTL ? 'العملاء' : 'Customers',
+      'nav.logout': isRTL ? 'تسجيل الخروج' : 'Logout',
+      'nav.login': isRTL ? 'تسجيل الدخول' : 'Login',
+    };
+    return messages[key] ?? key;
+  };
   const token = getAccessToken();
 
   // جيب عدد items الـ Cart

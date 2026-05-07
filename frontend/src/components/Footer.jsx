@@ -1,7 +1,16 @@
 import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language?.startsWith('ar');
+
+  const t = (key) => {
+    const messages = {
+      'footer.line1': isRTL ? 'متجر شارك — أزياء وإكسسوارات عالية الجودة.' : 'Shark Store — Quality fashion and accessories.',
+      'footer.line2': isRTL ? 'جميع الحقوق محفوظة.' : 'All rights reserved.',
+    };
+    return messages[key] ?? key;
+  };
 
   return (
     <footer

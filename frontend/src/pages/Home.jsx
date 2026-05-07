@@ -439,8 +439,22 @@ function ProductCard({ product, index, t, onAddToCart }) {
 // ─── Main Component ────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();  
   const isRTL = i18n.language === 'ar';
+
+  const t = (key) => {
+    const messages = {
+      'home.hero_title': isRTL ? 'اكتشف تشكيلات ستايل مميزة' : 'Discover premium style collections',
+      'home.hero_subtitle': isRTL ? 'تسوق أحدث المنتجات مع شحن سريع ودفع آمن.' : 'Shop the latest products with fast shipping and secure checkout.',
+      'home.shop_now': isRTL ? 'تسوق الآن' : 'Shop now',
+      'home.view_all': isRTL ? 'عرض الكل' : 'View all',
+      'home.categories': isRTL ? 'التصنيفات' : 'Categories',
+      'home.featured': isRTL ? 'منتجات مميزة' : 'Featured products',
+      'products.out_of_stock': isRTL ? 'نفد المخزون' : 'Out of stock',
+      'common.egp': isRTL ? 'ج.م' : 'EGP',
+    };
+    return messages[key] ?? key;
+  };
 
   const normalizeList = (data) => {
     if (Array.isArray(data)) return data;
