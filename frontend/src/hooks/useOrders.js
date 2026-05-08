@@ -18,11 +18,14 @@ function normalizeOrder(order) {
     products: items.map((item) => ({
       id: item.id,
       name: item.product_name,
+      variantName: item.variant_name || '',
+      size: item.size || null,
+      color: item.color || null,
       quantity: item.quantity,
       price: Number(item.price_at_order || 0),
       image: item.image || item.product_image || item.image_url || '',
     })),
-  };
+  };  
 }
 
 async function fetchOrders(params) {

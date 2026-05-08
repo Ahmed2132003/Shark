@@ -75,11 +75,28 @@ export default function OrderDetailsPage() {
                 <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
                 <tbody>
                   {!order.products?.length ? <tr><td colSpan={4} className="orders-muted" style={{ textAlign: 'center' }}>No items found for this order.</td></tr> : order.products.map((product) => (
-                    <tr key={product.id}><td>{product.name}</td><td>{product.quantity}</td><td>{formatMoney(product.price)}</td><td>{formatMoney(Number(product.price || 0) * Number(product.quantity || 0))}</td></tr>
+                    <tr key={product.id}>
+                      <td>
+                        <div>{product.name}</div>
+                        {(product.size || product.color) ? (
+                          <div className="orders-variant-meta">
+                            {product.size ? <span className="orders-variant-badge">📐 Size: {product.size}</span> : null}
+                            {product.color ? <span className="orders-variant-badge">🎨 Color: {product.color}</span> : null}
+                          </div>
+                        ) : (
+                          <div className="orders-variant-meta">
+                            {/* size/color missing from order item API response */}
+                          </div>
+                        )}
+                      </td>
+                      <td>{product.quantity}</td>
+                      <td>{formatMoney(product.price)}</td>
+                      <td>{formatMoney(Number(product.price || 0) * Number(product.quantity || 0))}</td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
+            </div>            
           </article>
         </div>
 

@@ -6,16 +6,28 @@ from apps.cart.models import Cart
 class OrderItemSerializer(serializers.ModelSerializer):
     subtotal = serializers.ReadOnlyField()
     image = serializers.SerializerMethodField()
+    size = serializers.SerializerMethodField()
+    color = serializers.SerializerMethodField()
 
     def get_image(self, obj):
         variant = getattr(obj, 'variant', None)
         product = getattr(variant, 'product', None)
         return product.main_image if product else None
+    
+    def get_size(self, obj):
+        variant = getattr(obj, 'variant', None)
+        size = getattr(variant, 'size', None)
+        return size.name if size else None
+
+    def get_color(self, obj):
+        variant = getattr(obj, 'variant', None)
+        color = getattr(variant, 'color', None)
+        return color.name if color else None
 
     class Meta:
         model  = OrderItem
-        fields = ['id', 'product_name', 'variant_name', 'price_at_order', 'quantity', 'subtotal', 'image']
-
+        fields = ['id', 'product_name', 'variant_name', 'price_at_order', 'quantity', 'subtotal', 'image', 'size', 'color']
+        
 
 class OrderStatusHistorySerializer(serializers.ModelSerializer):
     changed_by = serializers.StringRelatedField()

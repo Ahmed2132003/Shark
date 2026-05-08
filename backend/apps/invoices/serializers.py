@@ -48,10 +48,12 @@ class InvoiceSerializer(serializers.ModelSerializer):
                 'unit_price': item.price_at_order,
                 'quantity': item.quantity,
                 'subtotal': item.subtotal,
+                'size': item.variant.size.name if item.variant and item.variant.size else None,
+                'color': item.variant.color.name if item.variant and item.variant.color else None,
             }
             for item in obj.order.items.all()
         ]
-                
+                        
     class Meta:
         model = Invoice
         fields = [

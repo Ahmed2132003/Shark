@@ -31,11 +31,14 @@ function normalizeInvoice(invoice) {
     items: rawItems.map((item, index) => ({
       id: item.id || item.product_id || `${invoice.id}-${index}`,
       productName: item.product_name || item.product_title || item.name || item.title || item.variant_name || item.product?.name || 'Product',
+      variantName: item.variant_name || '',
+      size: item.size || null,
+      color: item.color || null,
       quantity: Number(item.quantity || 0),
       price: Number(item.unit_price || item.price || 0),
       total: Number(item.subtotal || item.line_total || Number(item.total_price || 0) || 0),      
       image: item.product_image || item.image || item.product?.image || null,
-    })),
+    })),    
   };
 }
 

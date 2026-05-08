@@ -79,11 +79,23 @@ export default function InvoiceDetailsPage() {
                   <tbody>
                     {(invoice.items || []).length ? (invoice.items || []).map((item) => (
                       <tr key={item.id}>
-                        <td>{item.productName || '-'}</td>
+                        <td>
+                          <div>{item.productName || '-'}</div>
+                          {(item.size || item.color) ? (
+                            <div className="orders-variant-meta">
+                              {item.size ? <span className="orders-variant-badge">📐 Size: {item.size}</span> : null}
+                              {item.color ? <span className="orders-variant-badge">🎨 Color: {item.color}</span> : null}
+                            </div>
+                          ) : (
+                            <div className="orders-variant-meta">
+                              {/* size/color missing from invoice item API response */}
+                            </div>
+                          )}
+                        </td>
                         <td>{item.quantity || 0}</td>
                         <td>{formatMoney(item.price || item.unit_price || 0)}</td>
                         <td>{formatMoney(item.total || item.subtotal || 0)}</td>                                              </tr>
-                    )) : (
+                    )) : (                      
                       <tr>
                         <td colSpan={4} className="orders-muted" style={{ textAlign: 'center' }}>No product lines available for this invoice.</td>
                       </tr>
