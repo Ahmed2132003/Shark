@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useThemeStore } from './store/themeStore';
 import { useAuthStore } from './store/authStore';
@@ -10,29 +10,29 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/Footer';
 
 // Pages
-import Home from './pages/Home';
-import Products from './pages/Products';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import OrderTracking from './pages/OrderTracking';
-import NotFound from './pages/NotFound';
+const Home = lazy(() => import('./pages/Home'));
+const Products = lazy(() => import('./pages/Products'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const OrderTracking = lazy(() => import('./pages/OrderTracking'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Protected
 import PrivateRoute from './components/ui/PrivateRoute';
-import Dashboard from './pages/admin/Dashboard';
-import OrdersListPage from './pages/orders/OrdersListPage';
-import OrderDetailsPage from './pages/orders/OrderDetailsPage';
-import NewOrderPage from './pages/orders/NewOrderPage';
-import MyOrdersPage from './pages/orders/MyOrdersPage';
-import CustomersListPage from './pages/customers/CustomersListPage';
-import CustomerDetailsPage from './pages/customers/CustomerDetailsPage';
-import InvoicesListPage from './pages/invoices/InvoicesListPage';
-import InvoiceDetailsPage from './pages/invoices/InvoiceDetailsPage';
-import ShippingSettingsPage from './pages/shipping/ShippingSettingsPage';
-import ProfilePage from './pages/ProfilePage';
+const Dashboard = lazy(() => import('./pages/admin/Dashboard'));
+const OrdersListPage = lazy(() => import('./pages/orders/OrdersListPage'));
+const OrderDetailsPage = lazy(() => import('./pages/orders/OrderDetailsPage'));
+const NewOrderPage = lazy(() => import('./pages/orders/NewOrderPage'));
+const MyOrdersPage = lazy(() => import('./pages/orders/MyOrdersPage'));
+const CustomersListPage = lazy(() => import('./pages/customers/CustomersListPage'));
+const CustomerDetailsPage = lazy(() => import('./pages/customers/CustomerDetailsPage'));
+const InvoicesListPage = lazy(() => import('./pages/invoices/InvoicesListPage'));
+const InvoiceDetailsPage = lazy(() => import('./pages/invoices/InvoiceDetailsPage'));
+const ShippingSettingsPage = lazy(() => import('./pages/shipping/ShippingSettingsPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 
 export default function App() {
   const { theme } = useThemeStore();
@@ -95,6 +95,7 @@ export default function App() {
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>        
         <Navbar />
         <main style={{ flex: 1 }}>
+          <Suspense fallback={<div className="app-loading-spinner" role="status" aria-live="polite">Loading…</div>}></Suspense>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />            
@@ -129,6 +130,7 @@ export default function App() {
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </main>
         <Footer />
       </div>

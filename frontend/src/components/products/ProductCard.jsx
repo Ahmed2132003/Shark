@@ -77,6 +77,8 @@ export default function ProductCard({ product, index, t, onAddToCart }) {
             src={imageSrc}
             alt={product.name}
             loading="lazy"
+            width="96"
+            height="96"
             onError={() => setImageError(true)}
             className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />

@@ -182,3 +182,11 @@
     border-right-color: var(--border);
   }
 }
+
+.app-loading-spinner {
+  min-height: 40vh;
+  display: grid;
+  place-items: center;
+  color: #e2e8f0;
+  font-weight: 600;
+}

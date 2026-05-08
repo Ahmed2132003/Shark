@@ -47,9 +47,10 @@ export default function ProductTable({ products, loading, onAddProduct, onEditPr
             <tr key={product.id}>
               <td>
                 <img
+                  loading="lazy"
                   className="product-table__image"
                   src={product.imageUrl || 'https://placehold.co/80x80?text=No+Image'}
-                  alt={product.name}
+                  alt={product.name} width="96" height="96"
                 />
               </td>
               <td>{product.name}</td>

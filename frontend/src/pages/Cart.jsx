@@ -93,6 +93,7 @@ function CartItemRow({ item, index, t, isRTL, onUpdate, onRemove }) {
         }}>
           {productImage ? (            
             <img
+                  loading="lazy"
               src={imageSrc}              
               alt={item.variant?.product?.name}
               onError={() => setImageError(true)}

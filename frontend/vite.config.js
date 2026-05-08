@@ -17,6 +17,11 @@ export default defineConfig(({ mode }) => {
       },
     },
 
+    test: {
+      environment: 'jsdom',
+      setupFiles: './src/test-setup.js',
+    },
+
     server: {
       host: true,
       port: 5173,

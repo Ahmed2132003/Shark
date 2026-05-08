@@ -47,6 +47,7 @@ function ImageGallery({ images, name }) {
           >
             {imgs[active]?.image ? (
               <img
+                  loading="lazy"
                 src={imgs[active].image}
                 alt={imgs[active].alt_text || name}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -92,7 +93,7 @@ function ImageGallery({ images, name }) {
               }}
             >
               {img.image ? (
-                <img src={img.image} alt={img.alt_text}
+                <img src={img.image} alt={img.alt_text} loading="lazy" width="96" height="96"
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{
