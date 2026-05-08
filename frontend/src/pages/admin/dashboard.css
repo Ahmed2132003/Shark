@@ -266,6 +266,7 @@
   place-items: center;
   padding: 20px;
   z-index: 45;
+  overflow: hidden;
 }
 
 .product-modal {
@@ -274,6 +275,8 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: var(--shadow-lg);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .product-modal__header {
