@@ -643,3 +643,20 @@
     gap: 18px;
   }
 }
+
+@media (max-width: 1024px) {
+  .orders-page { width: min(1200px, 100% - 32px); }
+  .orders-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .orders-page { width: min(1200px, 100% - 24px); margin: 20px auto 32px; }
+  .orders-filters { grid-template-columns: 1fr; }
+  .orders-surface { padding: 12px; }
+  .orders-table { min-width: 720px; }
+}
+
+@media (max-width: 425px) {
+  .orders-table { min-width: 640px; }
+  .orders-btn { width: 100%; }
+}
