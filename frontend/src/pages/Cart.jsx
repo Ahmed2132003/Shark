@@ -549,7 +549,20 @@ export default function Cart() {
     onSuccess:  () => queryClient.invalidateQueries(['cart']),
   });
 
-  const handleCheckout = () => navigate('/checkout');
+  const handleCheckout = () => {
+    const soldOutItems = items.filter(
+      item => item.variant?.product?.is_sold_out ||
+              item.variant?.product?.stock_status === 'sold_out'
+    );
+    if (soldOutItems.length > 0) {
+      alert(isRTL
+        ? 'يوجد منتجات نافدة في سلتك. يرجى إزالتها أولاً.'
+        : 'Some items in your cart are sold out. Please remove them first.');
+      return;
+    }
+    navigate('/checkout');
+  };
+  
   const [selectedRegionId, setSelectedRegionId] = useState(() => localStorage.getItem('selected_shipping_region') || '');
   const { data: regionsData, isError: regionsError } = useQuery({
     queryKey: ['shipping-regions'],

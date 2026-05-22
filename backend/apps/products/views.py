@@ -16,7 +16,6 @@ from .filters import ProductFilter
 # ─── Public Views ──────────────────────────────────────────────────────────────
 
 class CategoryListView(generics.ListAPIView):
-    """كل التصنيفات الـ root (بدون parent)"""
     serializer_class   = CategorySerializer
     permission_classes = [permissions.AllowAny]
 
@@ -25,7 +24,6 @@ class CategoryListView(generics.ListAPIView):
 
 
 class ProductListView(generics.ListAPIView):
-    """قائمة المنتجات مع Filter & Search"""
     serializer_class   = ProductListSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends    = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -35,11 +33,12 @@ class ProductListView(generics.ListAPIView):
     ordering           = ['-created_at']
 
     def get_queryset(self):
-        return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size')
+        return Product.objects.filter(is_active=True).select_related('category').prefetch_related(
+            'images', 'variants__stock', 'variants__color', 'variants__size'
+        )
 
 
 class ProductDetailView(generics.RetrieveAPIView):
-    """تفاصيل منتج واحد بالـ slug"""
     serializer_class   = ProductDetailSerializer
     permission_classes = [permissions.AllowAny]
     lookup_field       = 'slug'
@@ -51,7 +50,6 @@ class ProductDetailView(generics.RetrieveAPIView):
 
 
 class FeaturedProductsView(generics.ListAPIView):
-    """Top ordered products, fallback to newest real products"""
     serializer_class   = ProductListSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -70,77 +68,127 @@ class FeaturedProductsView(generics.ListAPIView):
         if top_ids:
             preserved = {pid: idx for idx, pid in enumerate(top_ids)}
             return sorted(
-                Product.objects.filter(id__in=top_ids, is_active=True).select_related('category').prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size'),
+                Product.objects.filter(id__in=top_ids, is_active=True)
+                    .select_related('category')
+                    .prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size'),
                 key=lambda p: preserved.get(p.id, 9999)
             )
 
-        return Product.objects.filter(is_active=True).select_related('category').prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size').order_by('-created_at')[:5]
+        return Product.objects.filter(is_active=True).select_related('category').prefetch_related(
+            'images', 'variants__stock', 'variants__color', 'variants__size'
+        ).order_by('-created_at')[:5]
 
 
-# ─── Admin Views (Dashboard) ───────────────────────────────────────────────────
+# ─── Admin Views ───────────────────────────────────────────────────────────────
 
 class IsAdminOrStaff(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role in ['admin', 'staff']
 
 
+def _wrap_django_file(processed_file, filename, content_type):
+    """Wrap an io.BytesIO as a Django InMemoryUploadedFile."""
+    from django.core.files.uploadedfile import InMemoryUploadedFile
+    processed_file.seek(0, 2)
+    size = processed_file.tell()
+    processed_file.seek(0)
+    return InMemoryUploadedFile(processed_file, 'image', filename, content_type, size, None)
+
+
 class AdminProductViewSet(viewsets.ModelViewSet):
-    """CRUD كامل للمنتجات من الـ Dashboard"""
     permission_classes = [IsAdminOrStaff]
     filter_backends    = [DjangoFilterBackend, filters.SearchFilter]
     search_fields      = ['name', 'category__name']
 
     def get_queryset(self):
-        # الـ Admin بيشوف كل المنتجات حتى الـ inactive
-        return Product.objects.all().select_related('category').prefetch_related('images', 'variants__stock', 'variants__color', 'variants__size')
+        return Product.objects.all().select_related('category').prefetch_related(
+            'images', 'variants__stock', 'variants__color', 'variants__size'
+        )
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return ProductWriteSerializer
         return ProductDetailSerializer
 
+    # ── Image Upload ───────────────────────────────────────────────────────────
     @action(detail=True, methods=['post'], parser_classes=[MultiPartParser, FormParser])
     def upload_image(self, request, pk=None):
-        """رفع صورة لمنتج معين"""
+        """Upload single image — supports JPG, PNG, WEBP, HEIC/HEIF."""
+        from .image_upload import validate_and_process_image
         product = self.get_object()
-        serializer = ProductImageSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(product=product)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        file_obj = request.FILES.get('image')
+        if not file_obj:
+            return Response({'detail': 'No image file provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            processed_file, filename, content_type = validate_and_process_image(file_obj)
+            django_file = _wrap_django_file(processed_file, filename, content_type)
+            is_primary = request.data.get('is_primary', request.data.get('is_main', 'false')) in [True, 'true', 'True', '1', 1]
+            image = ProductImage.objects.create(
+                product=product,
+                image=django_file,
+                alt_text=request.data.get('alt_text') or filename,
+                is_primary=is_primary,
+            )
+            return Response(
+                ProductImageSerializer(image, context={'request': request}).data,
+                status=status.HTTP_201_CREATED
+            )
+        except ValueError as exc:
+            return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exc:
+            return Response({'detail': f'Upload failed: {exc}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['get', 'post'], parser_classes=[MultiPartParser, FormParser])
     def images(self, request, pk=None):
-        """List or upload one or more images for a product."""
+        """List or upload images — supports multiple files and HEIC/HEIF."""
+        from .image_upload import validate_and_process_image
         product = self.get_object()
+
         if request.method.lower() == 'get':
-            return Response(ProductImageSerializer(product.images.all(), many=True, context={'request': request}).data)
+            return Response(
+                ProductImageSerializer(product.images.all(), many=True, context={'request': request}).data
+            )
 
         files = request.FILES.getlist('images') or request.FILES.getlist('image')
-        if not files and request.FILES.get('image'):
-            files = [request.FILES['image']]
         if not files:
-            serializer = ProductImageSerializer(data=request.data, context={'request': request})
-            serializer.is_valid(raise_exception=True)
-            serializer.save(product=product)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'detail': 'No image files provided.'}, status=status.HTTP_400_BAD_REQUEST)
 
         created = []
+        errors = []
         base_order = product.images.count()
-        is_primary_requested = request.data.get('is_primary', request.data.get('is_main', 'false')) in ['true', 'True', '1', True, 1]
-        for index, file_obj in enumerate(files):
-            image = ProductImage.objects.create(
-                product=product,
-                image=file_obj,
-                alt_text=request.data.get('alt_text') or file_obj.name,
-                is_primary=is_primary_requested and index == 0,
-                order=request.data.get('order') or base_order + index,
-            )
-            created.append(image)
-        return Response(ProductImageSerializer(created, many=True, context={'request': request}).data, status=status.HTTP_201_CREATED)
+        is_primary_requested = request.data.get('is_primary', request.data.get('is_main', 'false')) in [True, 'true', 'True', '1', 1]
+
+        for idx, file_obj in enumerate(files):
+            try:
+                processed_file, filename, content_type = validate_and_process_image(file_obj)
+                django_file = _wrap_django_file(processed_file, filename, content_type)
+                image = ProductImage.objects.create(
+                    product=product,
+                    image=django_file,
+                    alt_text=request.data.get('alt_text') or filename,
+                    is_primary=is_primary_requested and idx == 0,
+                    order=base_order + idx,
+                )
+                created.append(image)
+            except ValueError as exc:
+                errors.append({'file': getattr(file_obj, 'name', '?'), 'error': str(exc)})
+            except Exception as exc:
+                errors.append({'file': getattr(file_obj, 'name', '?'), 'error': f'Upload failed: {exc}'})
+
+        response_data = {
+            'images': ProductImageSerializer(created, many=True, context={'request': request}).data
+        }
+        if errors:
+            response_data['errors'] = errors
+
+        if not created and errors:
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['delete', 'patch'], url_path=r'images/(?P<image_id>[^/.]+)')
     def image_detail(self, request, pk=None, image_id=None):
-        """Update metadata for or delete a specific product image."""
         product = self.get_object()
         try:
             image = product.images.get(id=image_id)
@@ -156,7 +204,6 @@ class AdminProductViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get', 'post'])
     def variants(self, request, pk=None):
-        """List or add product variants."""
         product = self.get_object()
         if request.method.lower() == 'get':
             return Response(ProductVariantSerializer(product.variants.all(), many=True).data)
@@ -167,7 +214,6 @@ class AdminProductViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['put', 'patch', 'delete'], url_path=r'variants/(?P<variant_id>[^/.]+)')
     def variant_detail(self, request, pk=None, variant_id=None):
-        """Edit or delete a specific product variant."""
         product = self.get_object()
         try:
             variant = product.variants.get(id=variant_id)
@@ -183,17 +229,18 @@ class AdminProductViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def add_variant(self, request, pk=None):
-        """إضافة variant لمنتج معين"""
         product = self.get_object()
         serializer = ProductVariantWriteSerializer(data={**request.data, 'product': product.id})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 class AdminCategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrStaff]
     queryset = Category.objects.all().order_by('-created_at')
     serializer_class = CategorySerializer
+    parser_classes = [MultiPartParser, FormParser]
 
     def perform_create(self, serializer):
         name = serializer.validated_data.get('name', '').strip()

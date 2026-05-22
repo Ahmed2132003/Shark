@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+// frontend/src/components/layout/Navbar.jsx — UPDATED (Phase 5)
+// Changes: Logo replaced with shark-logo.png image
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -49,10 +51,7 @@ export default function Navbar() {
     localStorage.setItem('lang', i18n.language);
   }, [i18n.language, isRTL]);
 
-  const closeMenus = () => {
-    setMenuOpen(false);
-    setUserMenu(false);
-  };
+  const closeMenus = () => { setMenuOpen(false); setUserMenu(false); };
 
   const navLinks = [
     { to: '/', label: t('nav.home') },
@@ -78,36 +77,82 @@ export default function Navbar() {
         borderBottom: scrolled ? '1px solid var(--border)' : 'none',
       }}>
         <div className="nav-inner">
-          <Link to="/" className="nav-logo" onClick={closeMenus}>🦈 SHARK</Link>
+          {/* ── LOGO (Phase 5: image instead of emoji+text) ── */}
+          <Link to="/" className="nav-logo" onClick={closeMenus} style={{ display: 'flex', alignItems: 'center' }}>
+            <img
+              src="/shark-logo.png"
+              alt="Shark"
+              style={{
+                height: '38px',
+                width: 'auto',
+                objectFit: 'contain',
+                filter: theme === 'light' ? 'invert(1)' : 'none',
+              }}
+            />
+          </Link>
 
           <div className="desktop-nav">
             {navLinks.map((link) => (
-              <Link key={link.to} to={link.to} onClick={closeMenus} className={`nav-link ${location.pathname === link.to ? 'is-active' : ''}`}>{link.label}</Link>
+              <Link key={link.to} to={link.to} onClick={closeMenus}
+                className={`nav-link ${location.pathname === link.to ? 'is-active' : ''}`}>
+                {link.label}
+              </Link>
             ))}
           </div>
 
           <div className="nav-actions">
-            <button className="nav-icon-btn" onClick={() => i18n.changeLanguage(isRTL ? 'en' : 'ar')}>{isRTL ? 'EN' : 'ع'}</button>
-            <button className="nav-icon-btn" onClick={toggleTheme}>{theme === 'dark' ? '☀️' : '🌙'}</button>
-            <Link to="/cart" onClick={closeMenus} className="nav-cart-btn">🛒{cart?.total_items > 0 && <span className="nav-cart-count">{cart.total_items}</span>}</Link>
-            {isAuthenticated ? <button className="nav-user-btn" onClick={() => setUserMenu((s) => !s)}>👤 {user?.username?.slice(0, 8)}</button> : <Link to="/login" onClick={closeMenus} className="nav-user-btn">{t('nav.login')}</Link>}
+            <button className="nav-icon-btn" onClick={() => i18n.changeLanguage(isRTL ? 'en' : 'ar')}>
+              {isRTL ? 'EN' : 'ع'}
+            </button>
+            <button className="nav-icon-btn" onClick={toggleTheme}>
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+            <Link to="/cart" onClick={closeMenus} className="nav-cart-btn">
+              🛒{cart?.total_items > 0 && <span className="nav-cart-count">{cart.total_items}</span>}
+            </Link>
+            {isAuthenticated
+              ? <button className="nav-user-btn" onClick={() => setUserMenu((s) => !s)}>
+                  👤 {user?.username?.slice(0, 8)}
+                </button>
+              : <Link to="/login" onClick={closeMenus} className="nav-user-btn">{t('nav.login')}</Link>
+            }
             <button className="nav-menu-btn" aria-label={t('nav.menu')} onClick={() => setMenuOpen((s) => !s)}>☰</button>
           </div>
 
-          <AnimatePresence>{userMenu && isAuthenticated && (
-            <motion.div className="nav-dropdown" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>
-              {accountLinks.map((item) => <Link key={item.to} to={item.to} className="nav-dropdown-item" onClick={closeMenus}>{item.icon} {item.label}</Link>)}
-              <button className="nav-dropdown-item nav-danger" onClick={() => { logout(); closeMenus(); }}>🚪 {t('nav.logout')}</button>
-            </motion.div>
-          )}</AnimatePresence>
+          <AnimatePresence>
+            {userMenu && isAuthenticated && (
+              <motion.div className="nav-dropdown"
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>
+                {accountLinks.map((item) => (
+                  <Link key={item.to} to={item.to} className="nav-dropdown-item" onClick={closeMenus}>
+                    {item.icon} {item.label}
+                  </Link>
+                ))}
+                <button className="nav-dropdown-item nav-danger" onClick={() => { logout(); closeMenus(); }}>
+                  🚪 {t('nav.logout')}
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <AnimatePresence>{menuOpen && (
-          <motion.div className="mobile-menu" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
-            {navLinks.map((link) => <Link key={link.to} to={link.to} className="mobile-menu-link" onClick={closeMenus}>{link.label}</Link>)}
-            {isAuthenticated && accountLinks.map((item) => <Link key={item.to} to={item.to} className="mobile-menu-link" onClick={closeMenus}>{item.icon} {item.label}</Link>)}
-          </motion.div>
-        )}</AnimatePresence>
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div className="mobile-menu"
+              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}>
+              {navLinks.map((link) => (
+                <Link key={link.to} to={link.to} className="mobile-menu-link" onClick={closeMenus}>
+                  {link.label}
+                </Link>
+              ))}
+              {isAuthenticated && accountLinks.map((item) => (
+                <Link key={item.to} to={item.to} className="mobile-menu-link" onClick={closeMenus}>
+                  {item.icon} {item.label}
+                </Link>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
       <div style={{ height: '72px' }} />
     </>

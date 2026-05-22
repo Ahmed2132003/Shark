@@ -45,14 +45,17 @@ class AddToCartSerializer(serializers.Serializer):
     def validate(self, attrs):
         from apps.products.models import ProductVariant
         try:
-            variant = ProductVariant.objects.get(
-                id=attrs['variant_id'],
-                is_active=True
-            )
+            variant = ProductVariant.objects.get(id=attrs['variant_id'], is_active=True)
         except ProductVariant.DoesNotExist:
             raise serializers.ValidationError({"variant_id": "Variant not found or inactive."})
 
-        # تأكد إن الكمية المطلوبة موجودة في الـ Stock
+        # NEW: Check product-level sold_out override
+        if variant.product.stock_status == 'sold_out':
+            raise serializers.ValidationError({
+                "variant_id": "This product is sold out and cannot be added to cart."
+            })
+
+        # Existing stock check
         try:
             if variant.stock.quantity < attrs['quantity']:
                 raise serializers.ValidationError({

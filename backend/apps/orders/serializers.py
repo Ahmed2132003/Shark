@@ -75,6 +75,15 @@ class CreateOrderSerializer(serializers.Serializer):
     shipping_address = serializers.CharField()
     notes            = serializers.CharField(required=False, allow_blank=True)
     shipping_region_id = serializers.IntegerField()
+    sold_out_items = [
+        f"{item.variant.product.name} is marked as Sold Out."
+        for item in cart.items.all()
+        if item.variant.product.stock_status == 'sold_out'
+    ]
+    if sold_out_items:
+        raise serializers.ValidationError({
+            "sold_out_items": sold_out_items
+        })
 
     def validate(self, attrs):
         request = self.context['request']

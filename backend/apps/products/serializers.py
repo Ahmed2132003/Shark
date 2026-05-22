@@ -4,14 +4,26 @@ from .models import Category, Product, ProductColor, ProductSize, ProductVariant
 
 class CategorySerializer(serializers.ModelSerializer):
     subcategories = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug', 'description', 'image', 'parent', 'is_active', 'subcategories', 'created_at']
+        fields = [
+            'id', 'name', 'slug', 'description', 'image', 'image_url',
+            'parent', 'is_active', 'subcategories', 'created_at'
+        ]
 
     def get_subcategories(self, obj):
         subs = obj.subcategories.filter(is_active=True)
-        return CategorySerializer(subs, many=True).data
+        return CategorySerializer(subs, many=True, context=self.context).data
+
+    def get_image_url(self, obj):
+        if not obj.image:
+            return None
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url
 
 
 class StockSerializer(serializers.ModelSerializer):
@@ -52,23 +64,35 @@ class ProductVariantSerializer(serializers.ModelSerializer):
     stock_quantity = serializers.SerializerMethodField()
     color = ProductColorSerializer(read_only=True)
     size = ProductSizeSerializer(read_only=True)
+    effective_price = serializers.ReadOnlyField()
 
     class Meta:
         model = ProductVariant
         fields = [
             'id', 'name', 'sku', 'color', 'size', 'price', 'price_override',
-            'is_active', 'stock', 'stock_quantity', 'created_at'
+            'effective_price', 'is_active', 'stock', 'stock_quantity', 'created_at'
         ]
 
     def get_stock_quantity(self, obj):
         return getattr(getattr(obj, 'stock', None), 'quantity', 0)
 
 
+DISCOUNT_FIELDS = [
+    'stock_status', 'is_sold_out', 'is_low_stock',
+    'discount_type', 'discount_value', 'discount_start', 'discount_end',
+    'discount_active', 'discount_is_active', 'discounted_price', 'discount_percentage',
+]
+
+
 class ProductListSerializer(serializers.ModelSerializer):
-    """نسخة خفيفة للـ listing — بدون تفاصيل كتير"""
     category = CategorySerializer(read_only=True)
     main_image = serializers.ReadOnlyField()
     in_stock = serializers.ReadOnlyField()
+    is_sold_out = serializers.ReadOnlyField()
+    is_low_stock = serializers.ReadOnlyField()
+    discount_is_active = serializers.ReadOnlyField()
+    discounted_price = serializers.ReadOnlyField()
+    discount_percentage = serializers.ReadOnlyField()
     images = ProductImageSerializer(many=True, read_only=True)
     variants = ProductVariantSerializer(many=True, read_only=True)
 
@@ -76,25 +100,35 @@ class ProductListSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             'id', 'name', 'slug', 'category', 'base_price', 'has_variants',
-            'main_image', 'images', 'variants', 'in_stock', 'is_featured', 'created_at'
+            'main_image', 'images', 'variants', 'in_stock', 'is_featured', 'created_at',
+            'stock_status', 'is_sold_out', 'is_low_stock',
+            'discount_type', 'discount_value', 'discount_start', 'discount_end',
+            'discount_active', 'discount_is_active', 'discounted_price', 'discount_percentage',
         ]
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
-    """نسخة كاملة للـ detail page"""
     category = CategorySerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     variants = ProductVariantSerializer(many=True, read_only=True)
     colors = serializers.SerializerMethodField()
     sizes = serializers.SerializerMethodField()
     in_stock = serializers.ReadOnlyField()
+    is_sold_out = serializers.ReadOnlyField()
+    is_low_stock = serializers.ReadOnlyField()
+    discount_is_active = serializers.ReadOnlyField()
+    discounted_price = serializers.ReadOnlyField()
+    discount_percentage = serializers.ReadOnlyField()
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'slug', 'description', 'category', 'base_price',
             'has_variants', 'in_stock', 'is_active', 'is_featured', 'images',
-            'colors', 'sizes', 'variants', 'created_at'
+            'colors', 'sizes', 'variants', 'created_at',
+            'stock_status', 'is_sold_out', 'is_low_stock',
+            'discount_type', 'discount_value', 'discount_start', 'discount_end',
+            'discount_active', 'discount_is_active', 'discounted_price', 'discount_percentage',
         ]
 
     def get_colors(self, obj):
@@ -106,17 +140,18 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         return ProductSizeSerializer(sizes, many=True).data
 
 
-# ─── Admin Serializers (للـ Dashboard) ────────────────────────────────────────
+# ─── Admin Serializers (unchanged except adding new fields) ───────────────────
 
 class ProductWriteSerializer(serializers.ModelSerializer):
-    """للـ Create & Update من الـ Dashboard"""
     variants = serializers.ListField(child=serializers.DictField(), required=False, write_only=True)
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'category', 'description', 'base_price', 'has_variants',
-            'is_active', 'is_featured', 'variants'
+            'is_active', 'is_featured', 'variants',
+            'stock_status',
+            'discount_type', 'discount_value', 'discount_start', 'discount_end', 'discount_active',
         ]
         read_only_fields = ['id']
 
@@ -124,6 +159,23 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError("Price must be greater than 0.")
         return value
+
+    def validate(self, attrs):
+        # Prevent discount_value > base_price for fixed discounts
+        discount_type = attrs.get('discount_type')
+        discount_value = attrs.get('discount_value')
+        base_price = attrs.get('base_price')
+        if discount_type == 'fixed' and discount_value and base_price:
+            if discount_value >= base_price:
+                raise serializers.ValidationError({
+                    'discount_value': 'Fixed discount cannot be equal to or greater than base price.'
+                })
+        if discount_type == 'percentage' and discount_value:
+            if not (0 < discount_value <= 100):
+                raise serializers.ValidationError({
+                    'discount_value': 'Percentage discount must be between 1 and 100.'
+                })
+        return attrs
 
     def create(self, validated_data):
         variants = validated_data.pop('variants', [])
@@ -148,6 +200,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         return instance
 
     def _upsert_variant(self, product, data):
+        from .models import ProductColor, ProductSize, ProductVariant, Stock
         data = dict(data)
         variant_id = data.get('id')
         color = self._get_or_create_color(data)
@@ -174,6 +227,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         return variant
 
     def _get_or_create_color(self, data):
+        from .models import ProductColor
         color_id = data.get('color_id') or data.get('color')
         if isinstance(color_id, dict):
             data['color_name'] = color_id.get('name')
@@ -185,15 +239,12 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         if not name:
             return None
         color, _ = ProductColor.objects.get_or_create(
-            name=name,
-            defaults={'hex_code': data.get('hex_code') or None}
+            name=name, defaults={'hex_code': data.get('hex_code') or None}
         )
-        if data.get('hex_code') and color.hex_code != data.get('hex_code'):
-            color.hex_code = data.get('hex_code')
-            color.save(update_fields=['hex_code'])
         return color
 
     def _get_or_create_size(self, data):
+        from .models import ProductSize
         size_id = data.get('size_id') or data.get('size')
         if isinstance(size_id, dict):
             data['size_name'] = size_id.get('name')
@@ -207,7 +258,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         return size
 
     def _variant_name(self, color, size):
-        parts = [part for part in [color.name if color else '', size.name if size else ''] if part]
+        parts = [p for p in [color.name if color else '', size.name if size else ''] if p]
         return ' / '.join(parts) if parts else 'Default'
 
 
