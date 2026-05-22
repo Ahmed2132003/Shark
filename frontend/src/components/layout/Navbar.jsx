@@ -97,7 +97,7 @@ export default function Navbar() {
               minHeight: '40px',
             }}
           >
-            <span style={{ fontFamily: "'Cairo', 'Syne', sans-serif" }}>{isRTL ? 'شارك' : 'Shark'}</span>
+            <img src="/shark-logo.png" alt={isRTL ? 'شعار شارك' : 'Shark logo'} style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />            
           </Link>
 
           <div className="desktop-nav">

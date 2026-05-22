@@ -41,7 +41,7 @@ export default function InvoiceDetailsPage() {
           <div className="orders-stack">
             <article className="orders-card invoice-header-card">
               <div className="invoice-branding">
-                <p className="invoice-logo">🦈 SHARK</p>
+                <img src="/shark-logo.png" alt="Shark logo" className="invoice-logo" />                
                 <div>
                   <p className="orders-id-label">{invoice.invoiceId}</p>
                   <p className="orders-muted">Issued {formatDate(invoice.issueDate)}</p>
@@ -111,7 +111,7 @@ export default function InvoiceDetailsPage() {
               <h2 className="orders-section-title">Invoice Summary</h2>
               <div className="orders-price-grid">
                 <div className="orders-row-between"><span className="orders-muted">Subtotal</span><span>{formatMoney(invoice.subtotal)}</span></div>
-                <div className="orders-row-between"><span className="orders-muted">Shipping</span><span>{formatMoney(invoice.shipping || 0)}</span></div>
+                <div className="orders-row-between"><span className="orders-muted">Discount</span><span>-{formatMoney(invoice.discount || 0)}</span></div><div className="orders-row-between"><span className="orders-muted">Shipping</span><span>{formatMoney(invoice.shipping || 0)}</span></div>                
                 <div className="orders-row-between"><span className="orders-muted">Taxes</span><span>{formatMoney(invoice.tax)}</span></div>
                 <hr className="orders-divider" />
                 <div className="orders-row-between orders-row-between--strong"><span>Total Amount</span><span>{formatMoney(invoice.total)}</span></div>

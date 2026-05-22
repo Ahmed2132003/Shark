@@ -15,6 +15,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
     subtotal = serializers.SerializerMethodField()
     shipping = serializers.SerializerMethodField()
     tax = serializers.SerializerMethodField()
+    discount = serializers.SerializerMethodField()
     total = serializers.SerializerMethodField()
     items = serializers.SerializerMethodField()
 
@@ -33,6 +34,9 @@ class InvoiceSerializer(serializers.ModelSerializer):
 
     def get_tax(self, obj):
         return self._order_value_or_invoice_fallback(obj, 'tax', 'tax')
+
+    def get_discount(self, obj):
+        return self._order_value_or_invoice_fallback(obj, 'discount', 'discount')
 
     def get_total(self, obj):
         return self._order_value_or_invoice_fallback(obj, 'total', 'total')

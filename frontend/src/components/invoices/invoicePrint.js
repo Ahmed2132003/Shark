@@ -23,12 +23,12 @@ function invoiceHtml(invoice) {
   </style></head><body>
   <section class="invoice">
     <header class="invoice-head">
-      <div><div class="logo">🦈 SHARK</div><p>${companyInfo.companyName}</p></div>
+      <div><img class="logo" src="/shark-logo.png" alt="Shark logo" /><p>${companyInfo.companyName}</p></div>      
       <div><p><strong>Invoice:</strong> ${invoice.invoiceId}</p><p><strong>Issue Date:</strong> ${formatDate(invoice.issueDate)}</p><p><strong>Status:</strong> ${invoice.status}</p></div>
     </header>
     <div class="meta"><div><h2>Company Info</h2><p>${companyInfo.companyName}</p><p>${companyInfo.email}</p><p>${companyInfo.phone}</p><p>${companyInfo.address}</p></div><div><h2>Customer Info</h2><p>${invoice.customerName || '-'}</p><p>${invoice.customerEmail || invoice.customer_email || '-'}</p><p>${invoice.customerPhone || invoice.customer_phone || '-'}</p><p>${invoice.customerAddress || invoice.customer_address || '-'}</p></div></div>    
     <table><thead><tr><th>Product Name</th><th>Quantity</th><th>Price</th><th>Total</th></tr></thead><tbody>${rows(invoice.items)}</tbody></table>
-    <div class="totals"><div><span>Subtotal</span><span>${formatMoney(invoice.subtotal)}</span></div><div><span>Shipping</span><span>${formatMoney(invoice.shipping || 0)}</span></div><div><span>Taxes</span><span>${formatMoney(invoice.tax)}</span></div><div class="total-strong"><span>Total</span><span>${formatMoney(invoice.total)}</span></div></div>
+    <div class="totals"><div><span>Subtotal</span><span>${formatMoney(invoice.subtotal)}</span></div><div><span>Discount</span><span>- ${formatMoney(invoice.discount || 0)}</span></div><div><span>Shipping</span><span>${formatMoney(invoice.shipping || 0)}</span></div><div><span>Taxes</span><span>${formatMoney(invoice.tax)}</span></div><div class="total-strong"><span>Total</span><span>${formatMoney(invoice.total)}</span></div></div>    
   </section>
   </body></html>`;
 }

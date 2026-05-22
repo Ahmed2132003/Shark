@@ -11,6 +11,7 @@ function normalizeInvoice(invoice) {
   const shipping = Number(invoice.shipping ?? invoice.shipping_cost ?? invoice.delivery_fee ?? invoice.order?.shipping_fee ?? 0);
   const subtotal = Number(invoice.subtotal ?? 0);
   const tax = Number(invoice.tax || 0);
+  const discount = Number(invoice.discount ?? 0);
   const total = Number(invoice.total ?? 0);
 
   return {
@@ -26,6 +27,7 @@ function normalizeInvoice(invoice) {
     issueDate: invoice.issued_at || invoice.created_at,
     subtotal,
     tax,
+    discount,
     total,
     shipping,    
     items: rawItems.map((item, index) => ({
