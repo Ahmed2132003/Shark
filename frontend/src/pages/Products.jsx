@@ -82,10 +82,14 @@ function ProductCard({ product, index, t, onAddToCart }) {
     return resolveProductImageUrl(preferredImage);
   }, [imageError, preferredImage]);
 
+  const isSoldOut = product.is_sold_out || product.stock_status === 'sold_out' || !product.in_stock;
+  const hasDiscount = product.discount_is_active && product.discounted_price != null;
+  const discountPct = Number(product.discount_percentage || 0);
+
   const handleAdd = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!product.in_stock || adding) return;    
+    if (isSoldOut || adding) return;
     setAdding(true);
     await onAddToCart(product);
     setTimeout(() => setAdding(false), 800);
@@ -136,7 +140,25 @@ function ProductCard({ product, index, t, onAddToCart }) {
             </div>
           )}
 
-          {!product.in_stock && (
+          {hasDiscount && !isSoldOut && (
+            <div
+              style={{
+                position: 'absolute',
+                top: product.is_featured ? '44px' : '12px',
+                left: '12px',
+                background: 'linear-gradient(135deg,#ef4444,#dc2626)',
+                color: '#fff',
+                borderRadius: '8px',
+                padding: '4px 10px',
+                fontSize: '11px',
+                fontWeight: 800,
+              }}
+            >
+              -{discountPct}%
+            </div>
+          )}
+
+          {isSoldOut && (
             <div
               style={{
                 position: 'absolute',
@@ -193,35 +215,44 @@ function ProductCard({ product, index, t, onAddToCart }) {
               justifyContent: 'space-between',
             }}
           >
-            <div
-              style={{
-                fontSize: '20px',
-                fontWeight: 800,
-                background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              {Number(product.base_price).toLocaleString()} {t('common.egp')}
+            <div>
+              <div
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 800,
+                  background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                {hasDiscount
+                  ? Number(product.discounted_price).toLocaleString()
+                  : Number(product.base_price).toLocaleString()} {t('common.egp')}
+              </div>
+              {hasDiscount && (
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', textDecoration: 'line-through', marginInlineEnd: '8px' }}>
+                  {Number(product.base_price).toLocaleString()} {t('common.egp')}
+                </div>
+              )}
             </div>
 
             <Motion.button
               onClick={handleAdd}
-              whileHover={{ scale: product.in_stock ? 1.1 : 1 }}
-              whileTap={{ scale: product.in_stock ? 0.9 : 1 }}
+              whileHover={{ scale: !isSoldOut ? 1.1 : 1 }}
+              whileTap={{ scale: !isSoldOut ? 0.9 : 1 }}
               animate={adding ? { rotate: [0, -10, 10, 0] } : {}}
               style={{
                 width: '40px',
                 height: '40px',
                 background: adding
                   ? 'var(--success)'
-                  : product.in_stock
+                  : !isSoldOut
                     ? 'var(--accent-glow)'
                     : 'var(--bg-hover)',
                 border: `1px solid ${
                   adding
                     ? 'var(--success)'
-                    : product.in_stock
+                    : !isSoldOut
                       ? 'var(--accent)'
                       : 'var(--border)'
                 }`,
@@ -230,7 +261,7 @@ function ProductCard({ product, index, t, onAddToCart }) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '18px',
-                cursor: product.in_stock ? 'pointer' : 'not-allowed',
+                cursor: !isSoldOut ? 'pointer' : 'not-allowed',
                 transition: 'background 0.3s, border 0.3s',
                 flexShrink: 0,
               }}
