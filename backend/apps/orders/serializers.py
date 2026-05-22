@@ -75,15 +75,6 @@ class CreateOrderSerializer(serializers.Serializer):
     shipping_address = serializers.CharField()
     notes            = serializers.CharField(required=False, allow_blank=True)
     shipping_region_id = serializers.IntegerField()
-    sold_out_items = [
-        f"{item.variant.product.name} is marked as Sold Out."
-        for item in cart.items.all()
-        if item.variant.product.stock_status == 'sold_out'
-    ]
-    if sold_out_items:
-        raise serializers.ValidationError({
-            "sold_out_items": sold_out_items
-        })
 
     def validate(self, attrs):
         request = self.context['request']
@@ -100,6 +91,17 @@ class CreateOrderSerializer(serializers.Serializer):
         # تأكد إن الـ Cart مش فاضية
         if cart.is_empty:
             raise serializers.ValidationError("Your cart is empty.")
+
+        # تأكد إن مفيش items sold out
+        sold_out_items = [
+            f"{item.variant.product.name} is marked as Sold Out."
+            for item in cart.items.all()
+            if item.variant.product.stock_status == 'sold_out'
+        ]
+        if sold_out_items:
+            raise serializers.ValidationError({
+                "sold_out_items": sold_out_items
+            })
 
         # تأكد إن كل items متاحة في الـ Stock
         unavailable = [
@@ -126,7 +128,6 @@ class CreateOrderSerializer(serializers.Serializer):
         cart  = validated_data.pop('cart')
         request = self.context['request']
 
-        # إنشاء الـ Order
         order = Order.objects.create(
             customer=request.user,
             shipping_name=validated_data['shipping_name'],
@@ -138,7 +139,6 @@ class CreateOrderSerializer(serializers.Serializer):
             shipping_fee=validated_data['shipping_region'].price,
         )
 
-        # نقل الـ Cart items للـ Order + خصم من الـ Stock
         for item in cart.items.all():
             OrderItem.objects.create(
                 order=order,
@@ -148,18 +148,12 @@ class CreateOrderSerializer(serializers.Serializer):
                 price_at_order=item.variant.price,
                 quantity=item.quantity,
             )
-
-            # خصم الكمية من الـ Stock
             stock = item.variant.stock
             stock.quantity -= item.quantity
             stock.save()
 
-        # حساب الـ Total
         order.calculate_total()
-
-        # فراغ الـ Cart بعد الأوردر
         cart.clear()
-
         return order
 
 
