@@ -105,13 +105,6 @@ function HeroSection({ t, isRTL }) {
       <Motion.div style={{ y, opacity, position: 'relative', zIndex: 1, maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
         <Motion.div variants={stagger} initial="hidden" animate="visible">
 
-          {/* Badge */}
-          {hasDiscount && !isSoldOut && (
-            <div style={{ position: 'absolute', top: product.is_featured ? '44px' : '12px', left: '12px', background: 'linear-gradient(135deg,#ef4444,#dc2626)', color: '#fff', borderRadius: '8px', padding: '4px 10px', fontSize: '11px', fontWeight: 800 }}>
-              -{discountPct}%
-            </div>
-          )}
-
           <Motion.div variants={fadeUp} custom={0} style={{            
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             background: 'var(--accent-glow)',
@@ -162,11 +155,6 @@ function HeroSection({ t, isRTL }) {
           <Motion.div variants={fadeUp} custom={3}
             style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <Link to="/products" style={{ textDecoration: 'none' }}>
-              {hasDiscount && (
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)', textDecoration: 'line-through', marginInlineEnd: '8px' }}>
-                {Number(product.base_price).toLocaleString()} {t('common.egp')}
-              </div>
-            )}
             <Motion.button              
                 whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(108,99,255,0.4)' }}
                 whileTap={{ scale: 0.97 }}
@@ -183,11 +171,6 @@ function HeroSection({ t, isRTL }) {
             </Link>
 
             <Link to="/products" style={{ textDecoration: 'none' }}>
-              {hasDiscount && (
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)', textDecoration: 'line-through', marginInlineEnd: '8px' }}>
-                {Number(product.base_price).toLocaleString()} {t('common.egp')}
-              </div>
-            )}
             <Motion.button              
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
@@ -248,11 +231,11 @@ function HeroSection({ t, isRTL }) {
 }
 
 
+function CategoryCard({ cat, index }) {
   const [imgError, setImgError] = useState(false);
   const categoryImage = resolveProductImageUrl(cat?.image_url || cat?.image || '');
   const showCategoryImage = Boolean(categoryImage) && !imgError && categoryImage !== FALLBACK_IMAGE;
-  
-function CategoryCard({ cat, index }) {
+
   return (
     <Motion.div
       variants={fadeUp} custom={index}
