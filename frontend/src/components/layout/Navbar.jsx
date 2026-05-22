@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 // frontend/src/components/layout/Navbar.jsx — UPDATED (Phase 5)
-// Changes: Logo replaced with shark-logo.png image
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -77,27 +76,13 @@ export default function Navbar() {
         borderBottom: scrolled ? '1px solid var(--border)' : 'none',
       }}>
         <div className="nav-inner">
-          {/* Logo text-only for cleaner header alignment */}
           <Link
             to="/"
             className="nav-logo"
             onClick={closeMenus}
             aria-label={isRTL ? 'شارك - الرئيسية' : 'Shark - Home'}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '18px',
-              lineHeight: 1,
-              fontWeight: 800,
-              letterSpacing: '-0.2px',
-              textDecoration: 'none',
-              color: 'var(--text-primary)',
-              marginInlineEnd: '6px',
-              minHeight: '40px',
-            }}
           >
-            <img src="/shark-logo.png" alt={isRTL ? 'شعار شارك' : 'Shark logo'} style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />            
+            <span className="brand-wordmark">Shark</span>
           </Link>
 
           <div className="desktop-nav">

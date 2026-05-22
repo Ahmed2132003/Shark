@@ -23,7 +23,7 @@ function invoiceHtml(invoice) {
   </style></head><body>
   <section class="invoice">
     <header class="invoice-head">
-      <div><img class="logo" src="/shark-logo.png" alt="Shark logo" /><p>${companyInfo.companyName}</p></div>      
+      <div><p class="logo" aria-label="Shark logo text">Shark</p><p>${companyInfo.companyName}</p></div>        
       <div><p><strong>Invoice:</strong> ${invoice.invoiceId}</p><p><strong>Issue Date:</strong> ${formatDate(invoice.issueDate)}</p><p><strong>Status:</strong> ${invoice.status}</p></div>
     </header>
     <div class="meta"><div><h2>Company Info</h2><p>${companyInfo.companyName}</p><p>${companyInfo.email}</p><p>${companyInfo.phone}</p><p>${companyInfo.address}</p></div><div><h2>Customer Info</h2><p>${invoice.customerName || '-'}</p><p>${invoice.customerEmail || invoice.customer_email || '-'}</p><p>${invoice.customerPhone || invoice.customer_phone || '-'}</p><p>${invoice.customerAddress || invoice.customer_address || '-'}</p></div></div>    

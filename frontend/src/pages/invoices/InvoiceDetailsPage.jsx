@@ -41,7 +41,7 @@ export default function InvoiceDetailsPage() {
           <div className="orders-stack">
             <article className="orders-card invoice-header-card">
               <div className="invoice-branding">
-                <img src="/shark-logo.png" alt="Shark logo" className="invoice-logo" />                
+                <span className="invoice-logo" aria-label="Shark logo text">Shark</span>                             
                 <div>
                   <p className="orders-id-label">{invoice.invoiceId}</p>
                   <p className="orders-muted">Issued {formatDate(invoice.issueDate)}</p>

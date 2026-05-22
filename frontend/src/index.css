@@ -96,6 +96,19 @@ input, button, select, textarea { font: inherit; }
 }
 .nav-inner { max-width: 1400px; margin: 0 auto; min-height: 72px; display: flex; align-items: center; gap: 10px; position: relative; }
 .nav-logo { text-decoration: none; font-size: clamp(18px, 2.2vw, 26px); font-weight: 800; background: linear-gradient(135deg,#6C63FF,#A78BFA); -webkit-background-clip:text; -webkit-text-fill-color:transparent; white-space: nowrap; }
+.brand-wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  font-family: 'Syne', 'Cairo', sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.2rem, 2.3vw, 1.85rem);
+  line-height: 1;
+  letter-spacing: -0.7px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
 .desktop-nav { display: flex; gap: 8px; margin-inline-start: 10px; }
 .nav-link { text-decoration:none; padding:8px 14px; border-radius:10px; color:var(--text-secondary); font-weight:600; font-size:14px; }
 .nav-link.is-active { color: var(--accent); background: var(--accent-glow); }
