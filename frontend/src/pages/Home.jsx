@@ -633,12 +633,7 @@ export default function Home() {
                 </h2>
               </div>
               <Link to="/products" style={{ textDecoration: 'none' }}>
-                {hasDiscount && (
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)', textDecoration: 'line-through', marginInlineEnd: '8px' }}>
-                {Number(product.base_price).toLocaleString()} {t('common.egp')}
-              </div>
-            )}
-            <Motion.button                
+                <Motion.button                           
                   whileHover={{ x: isRTL ? -4 : 4 }}
                   style={{
                     background: 'transparent',
@@ -666,7 +661,7 @@ export default function Home() {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
                 gap: '24px',
-              >                
+              }}>                        
                 {featuredList.map((product, i) => (                  
                   <ProductCard key={product.id} product={product} index={i} t={t} onAddToCart={handleAddToCart} />                  
                 ))}
@@ -718,12 +713,7 @@ export default function Home() {
                 {t('home.hero_subtitle')}
               </p>
               <Link to="/products" style={{ textDecoration: 'none' }}>
-                {hasDiscount && (
-              <div style={{ fontSize: '12px', color: 'var(--text-muted)', textDecoration: 'line-through', marginInlineEnd: '8px' }}>
-                {Number(product.base_price).toLocaleString()} {t('common.egp')}
-              </div>
-            )}
-            <Motion.button                
+                <Motion.button                          
                   whileHover={{ scale: 1.05, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}
                   whileTap={{ scale: 0.97 }}
                   style={{
