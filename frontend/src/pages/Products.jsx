@@ -131,7 +131,7 @@ function ProductCard({ product, index, t, onAddToCart }) {
                 color: 'white',
                 borderRadius: '8px',
                 padding: '4px 12px',
-                fontSize: '11px',
+                fontSize: '14px',                
                 fontWeight: 700,
                 letterSpacing: '1px',
               }}
@@ -149,8 +149,8 @@ function ProductCard({ product, index, t, onAddToCart }) {
                 background: 'linear-gradient(135deg,#ef4444,#dc2626)',
                 color: '#fff',
                 borderRadius: '8px',
-                padding: '4px 10px',
-                fontSize: '11px',
+                padding: '6px 12px',
+                fontSize: '14px',                
                 fontWeight: 800,
               }}
             >
@@ -181,7 +181,7 @@ function ProductCard({ product, index, t, onAddToCart }) {
         <div style={{ padding: '20px' }}>
           <div
             style={{
-              fontSize: '11px',
+              fontSize: '14px',              
               color: 'var(--accent)',
               fontWeight: 700,
               marginBottom: '8px',
@@ -361,7 +361,7 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
       <div style={{ marginBottom: '28px' }}>
         <div
           style={{
-            fontSize: '11px',
+            fontSize: '14px',            
             fontWeight: 700,
             letterSpacing: '2px',
             color: 'var(--text-muted)',
@@ -401,7 +401,7 @@ function FilterPanel({ filters, setFilters, categories, t, isRTL, onClose, isMob
       <div style={{ marginBottom: '28px' }}>
         <div
           style={{
-            fontSize: '11px',
+            fontSize: '14px',            
             fontWeight: 700,
             letterSpacing: '2px',
             color: 'var(--text-muted)',
@@ -622,7 +622,7 @@ export default function Products() {
         >
           <div
             style={{
-              fontSize: '11px',
+              fontSize: '14px',              
               color: 'var(--accent)',
               fontWeight: 700,
               letterSpacing: '3px',

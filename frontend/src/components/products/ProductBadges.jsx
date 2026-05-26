@@ -26,7 +26,7 @@ export function LowStockBadge({ quantity, style = {} }) {
       border: '1px solid rgba(245,158,11,0.5)',
       color: '#f59e0b',
       borderRadius: '8px', padding: '4px 10px',
-      fontSize: '11px', fontWeight: 800, letterSpacing: '1px',
+      fontSize: '14px', fontWeight: 800, letterSpacing: '1px',      
       ...style,
     }}>
       ⚠ Low Stock{quantity != null ? ` (${quantity})` : ''}

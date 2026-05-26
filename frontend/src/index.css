@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Cairo:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Cairo:wght@300;400;500;600;700;900&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
 /* ─── Dark Theme (Default) ─────────────────────────── */
 :root[data-theme="dark"] {
@@ -69,7 +69,7 @@ body {
 
 /* RTL/LTR */
 [dir="rtl"] { font-family: 'Cairo', sans-serif; }
-[dir="ltr"] { font-family: 'Syne', 'Cairo', sans-serif; }
+[dir="ltr"] { font-family: 'Playfair Display', 'Times New Roman', serif; }
 
 /* ─── Scrollbar ─────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
@@ -95,18 +95,12 @@ input, button, select, textarea { font: inherit; }
   transition: all 0.3s ease; padding-inline: clamp(12px, 4vw, 5%);
 }
 .nav-inner { max-width: 1400px; margin: 0 auto; min-height: 72px; display: flex; align-items: center; gap: 10px; position: relative; }
-.nav-logo { text-decoration: none; font-size: clamp(18px, 2.2vw, 26px); font-weight: 800; background: linear-gradient(135deg,#6C63FF,#A78BFA); -webkit-background-clip:text; -webkit-text-fill-color:transparent; white-space: nowrap; }
+.nav-logo { text-decoration: none; display: inline-flex; align-items: center; }
 .brand-wordmark {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  font-family: 'Syne', 'Cairo', sans-serif;
-  font-weight: 800;
-  font-size: clamp(1.2rem, 2.3vw, 1.85rem);
-  line-height: 1;
-  letter-spacing: -0.7px;
-  text-transform: uppercase;
-  color: var(--text-primary);
+  display: block;
+  width: clamp(110px, 14vw, 148px);
+  height: auto;
+  object-fit: contain;  
 }
 
 .desktop-nav { display: flex; gap: 8px; margin-inline-start: 10px; }

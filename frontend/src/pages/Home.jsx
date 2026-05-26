@@ -265,23 +265,12 @@ function CategoryCard({ cat, index }) {
               onError={() => setImgError(true)}
               style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92, transition: 'transform 0.4s ease' }}
             />
-          ) : (    
-          <div style={{
-            fontSize: 'clamp(18px, 2.2vw, 26px)',
-            fontWeight: 500,
-            background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontFamily: "'Syne', sans-serif",
-            letterSpacing: '-0.5px',
-            lineHeight: 1,
-            whiteSpace: 'nowrap',
-            maxWidth: '100%',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',            
-          }}>
-            🦈 SHARK            
-          </div>
+          ) : (
+            <img
+              src="/shark-logo.png"
+              alt="Shark"
+              style={{ width: '130px', height: 'auto', objectFit: 'contain' }}
+            />          
           )}
         </div>        
         <div style={{ padding: '16px' }}>

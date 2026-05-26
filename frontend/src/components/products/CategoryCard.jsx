@@ -53,15 +53,11 @@ export default function CategoryCard({ cat, index }) {
               style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
             />
           ) : (
-            <div style={{
-              fontSize: 'clamp(18px, 2.2vw, 26px)',
-              fontWeight: 700,
-              background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              fontFamily: "'Syne', sans-serif",
-            }}>
-              🦈 SHARK
-            </div>
+            <img
+              src="/shark-logo.png"
+              alt="Shark"
+              style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+            />
           )}
         </div>
 

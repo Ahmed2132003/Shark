@@ -334,14 +334,11 @@ export default function Register() {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link to="/" style={{ textDecoration: 'none' }}>
-            <div style={{
-              fontSize: '32px', fontWeight: 800,
-              background: 'linear-gradient(135deg, #6C63FF, #A78BFA)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              fontFamily: "'Syne', sans-serif", marginBottom: '8px',
-            }}>
-              🦈 SHARK
-            </div>
+            <img
+              src="/shark-logo.png"
+              alt="Shark"
+              style={{ width: '160px', height: 'auto', marginBottom: '8px' }}
+            />            
           </Link>
           <h1 style={{
             fontSize: '26px', fontWeight: 800,
