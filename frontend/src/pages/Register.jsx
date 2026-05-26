@@ -334,10 +334,11 @@ export default function Register() {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link to="/" style={{ textDecoration: 'none' }}>
-            <img
-              src="/shark-logo.png"
-              alt="Shark"
-              style={{ width: '160px', height: 'auto', marginBottom: '8px' }}
+            <span
+              className="shark-logo-mark"
+              role="img"
+              aria-label="Shark"
+              style={{ width: '160px', height: '52px', marginBottom: '8px' }}              
             />            
           </Link>
           <h1 style={{

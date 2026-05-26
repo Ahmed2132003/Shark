@@ -82,7 +82,7 @@ export default function Navbar() {
             onClick={closeMenus}
             aria-label={isRTL ? 'شارك - الرئيسية' : 'Shark - Home'}
           >
-            <img className="brand-wordmark" src="/shark-logo.png" alt="Shark" />            
+            <span className="brand-wordmark" role="img" aria-label="Shark" />                                    
           </Link>
 
           <div className="desktop-nav">

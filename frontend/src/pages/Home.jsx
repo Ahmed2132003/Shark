@@ -266,10 +266,11 @@ function CategoryCard({ cat, index }) {
               style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92, transition: 'transform 0.4s ease' }}
             />
           ) : (
-            <img
-              src="/shark-logo.png"
-              alt="Shark"
-              style={{ width: '130px', height: 'auto', objectFit: 'contain' }}
+            <span
+              className="shark-logo-mark"
+              role="img"
+              aria-label="Shark"
+              style={{ width: '130px', height: '42px' }}              
             />          
           )}
         </div>        

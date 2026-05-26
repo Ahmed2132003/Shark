@@ -53,10 +53,11 @@ export default function CategoryCard({ cat, index }) {
               style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
             />
           ) : (
-            <img
-              src="/shark-logo.png"
-              alt="Shark"
-              style={{ width: '120px', height: 'auto', objectFit: 'contain' }}
+            <span
+              className="shark-logo-mark"
+              role="img"
+              aria-label="Shark"
+              style={{ width: '120px', height: '40px' }}
             />
           )}
         </div>

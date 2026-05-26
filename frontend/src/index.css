@@ -97,10 +97,19 @@ input, button, select, textarea { font: inherit; }
 .nav-inner { max-width: 1400px; margin: 0 auto; min-height: 72px; display: flex; align-items: center; gap: 10px; position: relative; }
 .nav-logo { text-decoration: none; display: inline-flex; align-items: center; }
 .brand-wordmark {
-  display: block;
-  width: clamp(110px, 14vw, 148px);
-  height: auto;
-  object-fit: contain;  
+  display: inline-block;
+  width: clamp(92px, 10.5vw, 122px);
+  height: clamp(30px, 3.6vw, 38px);
+  background: #fff;
+  -webkit-mask: url('/shark-logo.png') center / contain no-repeat;
+  mask: url('/shark-logo.png') center / contain no-repeat;
+}
+
+.shark-logo-mark {
+  display: inline-block;
+  background: #fff;
+  -webkit-mask: url('/shark-logo.png') center / contain no-repeat;
+  mask: url('/shark-logo.png') center / contain no-repeat;  
 }
 
 .desktop-nav { display: flex; gap: 8px; margin-inline-start: 10px; }
