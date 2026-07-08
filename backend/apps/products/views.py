@@ -31,6 +31,8 @@ class ProductListView(generics.ListAPIView):
     search_fields      = ['name', 'description', 'category__name']
     ordering_fields    = ['base_price', 'created_at']
     ordering           = ['-created_at']
+    # لا يوجد حد أقصى لعدد المنتجات المعروضة — يرجع كل المنتجات دفعة واحدة
+    pagination_class   = None
 
     def get_queryset(self):
         return Product.objects.filter(is_active=True).select_related('category').prefetch_related(
@@ -57,6 +59,9 @@ class FeaturedProductsView(generics.ListAPIView):
         from django.db.models import Sum
         from apps.orders.models import OrderItem
 
+        # ملحوظة: الـ [:5] هنا مقصود ومختلف عن الـ pagination —
+        # ده منطق "Top Selling / Featured" بيعرض أفضل 5 منتجات مبيعًا فقط،
+        # مش limit عام على المنتجات، فتم تركه كما هو.
         top_ids = list(
             OrderItem.objects.filter(order__status__in=['delivered'])
             .values('variant__product_id')
@@ -99,6 +104,8 @@ class AdminProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrStaff]
     filter_backends    = [DjangoFilterBackend, filters.SearchFilter]
     search_fields      = ['name', 'category__name']
+    # لا يوجد حد أقصى لعدد المنتجات في الداشبورد — يرجع كل المنتجات دفعة واحدة
+    pagination_class   = None
 
     def get_queryset(self):
         return Product.objects.all().select_related('category').prefetch_related(

@@ -221,6 +221,8 @@ class AdminOrderManageView(generics.RetrieveUpdateDestroyAPIView):
 class ShippingRegionListCreateView(generics.ListCreateAPIView):
     queryset = ShippingRegion.objects.all()
     permission_classes = [permissions.IsAuthenticated]
+    # لا يوجد حد أقصى لعدد المحافظات — يرجع كل المحافظات دفعة واحدة
+    pagination_class = None
 
     def get_permissions(self):
         if self.request.method == 'GET':
